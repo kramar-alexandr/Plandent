@@ -1,0 +1,44 @@
+
+begin
+
+  // RecordAddBegin(CUVc,"cu5");
+  // RecordField(SuppContrNo,M4Str,20,0);
+  // RecordField(OurCustDate,M4Date,0,0);
+  // RecordField(LicContrNo,M4Str,20,0);
+
+  // ChangeField(Name,M4Str,255,0);
+  // ChangeMatrixField(ArtCode,M4Code,30,INVc);
+
+  // ArrayField(CustArrStr,M4Str,255,0);
+  // ArrayField(CustArrInt,M4Int,0,0);
+  // KeyBegin(NewKey);
+  // KeySegment(CustomStr);
+  // KeySegment(Code);
+  // SubSetKeyBegin2(CustArrStr);
+  // AppendMatrixFieldToKeyName(CustArrStr,0);
+  // KeySegment(Code);
+
+
+  // DisableIndex("IndexName");
+  // EndRecordAdd;
+
+  RecordAddBegin(SVOSerVc,"PL_SVOSerVc2");
+    SubSetKeyBegin2(CustMainKey);
+    AppendFieldToKeyName(CustCode);
+    KeySegment(SerialNr);
+    KeySegment(ItemCode);
+
+    SubSetKeyBegin2(CustItemCode);
+    AppendFieldToKeyName(CustCode);
+    KeySegment(ItemCode);
+    KeySegment(SerialNr);
+
+    KeyBegin(CustItemName);
+    AppendFieldToKeyName(CustCode);
+    KeySegment(ItemName);
+    KeySegment(SerialNr);
+    KeySegment(ItemCode);
+  EndRecordAdd;
+  
+  return;
+end;

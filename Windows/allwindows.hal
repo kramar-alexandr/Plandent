@@ -1,0 +1,200 @@
+/* Needs to be Translated to LIT */
+external inner function Boolean HasVarieties();
+external inner function Boolean HasItemGroups();
+external inner function Boolean HasItemClassification();
+external inner function Boolean HasDepartments();
+external inner function Boolean HasPriceLists();
+external inner function Boolean HasLanguages();
+external inner function Boolean HasMultiCurrency();
+external inner function Boolean HasModSVO();
+external inner function Boolean HasExtTax();
+external inner function Boolean HasWithholdingTax();
+external inner function Boolean IsEnterprise();
+external inner function Boolean StandardHansa();
+
+SetLangMode(LangLithuanian,"LIT",2);
+
+window ItemSettingTClass:3
+  wtag("language","LIT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  real h,v,vm,vs;
+  WindowBegin("Prekės parametrai",ItemSettingTClass,CGSbl,ItemSettingType);
+  SetWRect(64,80,580,500);
+  SetBlid(ItemSettingBlock);
+  v = 6; vs = 20; h = 200;
+  EditField(h,v,60,"Pagr. prekės grupė",Normal,DefIGroup,false,ITSClass);
+  if (HasModSVO) then begin
+    if (StandardHansa==false) then begin
+      EditField(h,v+=vs,60,"Garantijos galiojimas",Normal,WarrantyLength,false,0);
+    end;
+    EditField(h,v+=vs,60,"Vienetas",Normal,Unittext,false,UnitSCLass);
+  end;
+  EditField(h,v+=vs,60,"Brūkšn. kodo ilgis (be čekio sumos)",Normal,BarCodeLength,false,0);
+  EditField(h,v+=vs,60,"Pagrindinis klasės rūšiavimo tipas",Normal,ClassType,false,CTypeSClass); //EBS
+  if (IsEnterprise and StandardHansa==false) then begin
+    EditField(h,v+=vs,120,"Priskirtas brūkšn. kodo nr.",Normal,YourBarCodeDef,false,0);
+    EditField(h,vm=(v+=vs),120,"Pradėti brūkšn. kodą nuo",Normal,BarCodeStartFrom,false,0);
+  end else begin
+    v = v+vs;
+    vm = v;
+  end;
+  CheckBox(h=35,vm=(v=vm+25),0,"Unikalus barkodas",UniqueBarCode);
+  if (IsEnterprise) then begin
+    CheckBox(h,v+=16,0,"Rodyti galiojimo laiką",BestBefore);
+    CheckBox(h,v+=16,0,"Rodyti siuntos būklę",BatchStatus);
+    CheckBox(h,v+=16,0,"Rodyti prekės būklę",ShowItemStatus);
+  end;
+  if (HasExtTax) then begin
+    CheckBox(h,v+=16,0,"Skaičiuoti percepcinius mokesčius",Perceptions);
+  end;
+  if (HasWithholdingTax) then begin
+    CheckBox(h,v+=16,0,"Skaičiuoti sulaikymo mokesčius",Withholdings);
+  end;
+  if (IsEnterprise) then begin
+    CheckBox(h,v+=16,0,"Keičiant datą atnaujinti kainas įrašuose su valiuta",UpdCurPrWithDate);
+    CheckBox(h=250,v=vm,0,"Neleisti bazinės kainos pakeitimo",NoBasePriceChange);
+    if (StandardHansa==false) then begin
+      CheckBox(h,v+=16,0,"Prekės formulė",ItemFormulaeInclVAT);
+    end;
+    CheckBox(h,v+=16,0,"Leisti kiekio skaičiavimą",EnCalcDimQty);
+    CheckBox(h,v+=16,0,"Reikalauti prekės grupės",DemandItemGroup);
+    if (StandardHansa==false) then begin
+      CheckBox(h,v+=16,0,"Naudoti supersesijos prekes",UseSupersessionIN);
+    end;
+  //CheckBox(h,v+=16,0,"Naudoti kelių pirk. nuolaidą",MultiBuyDiscount);
+    if (StandardHansa==false) then begin
+      ButtonFrame(h=35,vm=(v+=76),173,4,"Pagrindinis prekės tipas");
+    end else begin
+      ButtonFrame(h=35,vm=(v+=76),173,3,"Pagrindinis prekės tipas");
+    end;
+    RadioButton(h,v,0,0,"Paprasta",DefItemType);
+    RadioButton(h,v+=16,1,0,"Sandėliuojama",DefItemType);
+    RadioButton(h,v+=16,2,0,"Struktūrinė",DefItemType);
+    if (StandardHansa==false) then begin
+      RadioButton(h,v+=16,3,0,"Paslauga",DefItemType);
+      ButtonFrame(h,v+=40,173,3,"Serijinio nr. kontrolė");
+    end else begin
+      ButtonFrame(h,v+=57,173,3,"Serijinio numerio kontrolė");
+    end;
+    RadioButton(h,v,0,0,"Nėra",SerNrf);
+    RadioButton(h,v+=16,1,0,"Vieneto",SerNrf);
+    RadioButton(h,v+=16,2,0,"Siuntos",SerNrf);
+    ButtonFrame(h=250,v=vm,200,4,"Atnaujinti savikainą patvirtinus gavimą");
+    RadioButton(h,v,0,0,"Nr.",UpdateCost);
+    RadioButton(h,v+=16,1,0,"Paskutinė pirkimų kaštai(su pap. kašt.)",UpdateCost);
+    RadioButton(h,v+=16,2,0,"Svertinis vidurkis",UpdateCost);
+    RadioButton(h,v+=16,3,0,"Pask. pirk. kaštai(be pap. kašt.)",UpdateCost);
+    ButtonFrame(h,v+=40,200,3,"Atnaujinti savik. Sand. perkainavimuose");
+    RadioButton(h,v,0,0,"Neatnaujinti",SRUpdateCost);
+    RadioButton(h,v+=16,1,0,"Paskutinio perkainavimo savik.",SRUpdateCost);
+    RadioButton(h,v+=16,2,0,"Svertinis vidurkis",SRUpdateCost);
+  end else begin
+    CheckBox(h,v+=16,0,"Neleisti bazinių kainų keitimo",NoBasePriceChange);
+    CheckBox(h,v+=16,0,"Prekės formulė",ItemFormulaeInclVAT);
+    CheckBox(h,v+=16,0,"Reikalauti Prekės grupės",DemandItemGroup);
+  end;
+  EndWindow;
+end;
+
+window PriceRClass:3
+  wtag("language","LIT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  real h,h2,v,vm,vs;
+  WindowBegin("Kainoraštis",PriceRClass,CGRcW,RcType);
+  SetWRect(20,80,420,350);
+  v = 6; vs = 20; h = 120;
+  EditFieldTL(h,v, 150,"Prekė",   M4UStr,Normal,50,f1,false,INSClass);
+  if (HasItemGroups) then begin
+  	EditFieldTL(h,v+=vs, 150,"Prekės grupė",   M4UStr,Normal,11,f3,false,ITSClass);
+  end;
+  if (HasItemClassification) then begin
+  EditFieldTL(h,v+=vs, 150,"Klasė",   M4UStr,Normal,11,ObjStr,false,DISClass);
+  end;
+  if (HasDepartments) then begin
+  EditFieldTL(h,v+=vs, 150,"Skyrius",   M4UStr,Normal,11,f4,false,DepSClass);
+  end;
+  EditFieldTL(h,v+=vs, 150,"Customer",   M4UStr,Normal,20,f5,false,CUSClass); //!!TRANSLATE
+  if (HasPriceLists) then begin
+  EditFieldTL(h,v+=vs, 70,"Kainoraštis",   M4UStr,Normal,5,f2,false,PLDefSClass);
+  end;
+  if (HasLanguages) then begin
+  EditFieldTL(h,v+=vs, 70,"Kalba",   M4UStr,Normal,5,Stext,false,LangSClass);
+  end;
+  EditFieldTL(h,v+=vs, 70,"Rūšiavimo klasės tipas",M4Code,Normal,10,f12,false,CTypeSClass); //EBS
+  vm = v+=41;
+  if (IsEnterprise) then begin
+    ButtonFrame(h+=80,v=vm,123,2,"Funkcija");
+  RadioButton(h,v,0,0,"Išorinis",flags[3]);
+  RadioButton(h,v+=16,1,0,"Vidinis",flags[3]);
+//    ButtonFrame(h+=150,v=vm,123,3,"Sorting");
+    h = 50;
+  end else begin
+  end;
+  ButtonFrame(h,v=vm,123,3,"Rūšiavimas");
+  RadioButton(h,v,0,0,"Nr.",flags[2]);
+  if (HasItemGroups) then begin
+  RadioButton(h,v+=16,1,0,"Grupė",flags[2]);
+	end;
+  RadioButton(h,v+=16,2,0,"Aprašymas",flags[2]);
+  RadioButton(h,v+=16,3,0,"Klasė",flags[2]); //EBS
+  EndFrame;
+  v = v + 24;
+  if (IsEnterprise) then begin
+    h = 50;
+  end;
+  CheckBox(h,vm=v, 70,"Kainos su PVM",flags[8]);
+  CheckBox(h,v+=16, 70,"Kainos be PVM",flags[9]);
+  CheckBox(h,v+=16, 70,"Tik prekės su likučiais",flags[4]);
+  CheckBox(h,v+=16, 70,"Tik šio kainoraščio prekės",flags[5]);
+  if (HasMultiCurrency) then begin
+  	CheckBox(h,v+=16, 70,"Didinti su kursu (valiuta iš kainoraščio)",flags[6]);
+	end;
+  v = vm;
+  if (HasVarieties) then begin
+    CheckBox(h2=200,v,0,"Rodyti įvairoves",flags[7]);
+    v = v + 16;
+  end;
+  if (IsEnterprise) then begin
+  CheckBox(h2,v,0,"Įtraukti kiekines nuolaidas",flags[10]);
+  end;
+  EndWindow;
+end;
+
+window LitIntrastatVIEClass:1
+  wtag("language","LIT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  real h,v,vs;
+  WindowBegin("Specify Intrastat (Lithuania)",LitIntrastatVIEClass,CGEcW,RcType);
+  SetWRect(64,80,500,300);
+  vs = 20; h = 150; v = 6;
+  PeriodField(h,v,"Period");
+  EditFieldTL(h,v+=vs,70,"No.", M4UStr,Normal,41,f1,false,0);
+  EditFieldTL(h,v+=vs,70,"Version",M4StrSet,Normal,631,f3,false,StrSetSClass);
+  EditFieldTL(h,v+=vs,70,"Intrastat No.", M4UStr,Normal,16,f4,false,0);
+  EditFieldTL(h,v+=vs,70,"Intrastat Date",M4Date,Normal,0,d1,false,PasteCurDate);
+  EditFieldTL(h,v+=vs,120,"Contact", M4UStr,Normal,60,f5,false,CUSClass);
+  EditFieldTL(h,v+=vs,120,"#Supplier#", M4UStr,Normal,20,f6,false,VESClass);
+  EndWindow;
+end;
+
+window PL_SVOSerSClass:1
+  wtag("language","LIT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  WindowBegin("Įstatyti žinomą serijinį nr.",PL_SVOSerSClass,CGslist,SVOSerView);
+  SetWRect(20,80,600,291);
+  Sizeable(-1,-1,0,0);
+  UseView(SVOSerVc);
+  SpawnClass(SVOSerDClass);
+  RecordList(4,17,-21,-39);
+  RlColKey(4,2,"Ser. nr.",SerialNr,false,CustMainKey);
+//  RlCol(74,71,"In Stock",xInStock,false);
+  RlCol(120,120,"Pirk.",CustCode,false);
+  RlCol(200,200,"Pavadinimas",CustName,false);
+  RlColKey(300,300,"Prekė",ItemCode,false,CustItemCode);
+  RlColKey(380,380,"Aprašymas",ItemName,false,CustItemName);
+  RlCol(-140,-140,"Parduota",SoldDate,false);
+  RlCol(-70,-70,"Garantija iki",WarrantyUntil,false);
+  SpecialMenu("Ser. numerio istorija",'h',1,"SerHistSVOSerLsm");
+  SearchField("Ieškoti");
+  EndWindow;
+end;
