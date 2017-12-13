@@ -1,0 +1,24 @@
+
+
+
+event startup
+begin
+  Real h,v,l,vs;
+
+  SetLangMode(LangLithuanian,"LIT",2);
+
+  /* Lithuania Instrastat Export */
+  StrSetBegin(631);
+  StrSetText(O,"Primary");
+  StrSetText(N,"Blank");
+  StrSetText(M,"Revising");
+  EndStrSet;
+
+  SString(1000001,"Rūšiavimo klasės tipas turi būti nurodytas!");
+
+  SString(1000002,"Gamintojo prekės kodas");
+	SString(1000003,"Prekės vnt.");
+	SString(1000004,"Gamintojas");
+
+  return;
+end;

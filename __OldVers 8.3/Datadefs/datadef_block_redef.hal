@@ -1,0 +1,34 @@
+
+begin
+
+  BlockBegin(ItemSettingBlock,ItemSettingType,"");
+  CacheBlockInClient;
+  RecordField(DefIGroup,M4Code,5,0);
+  RecordField(UniqueBarCode,M4Int,0,0);
+  RecordField(BestBefore,M4Int,0,0);
+  RecordField(ShowItemStatus,M4Int,0,0);
+  RecordField(BarCodeLength,M4Int,0,0);
+  RecordField(DefItemType,M4Int,0,0);
+  RecordField(NoBasePriceChange,M4Int,0,0);
+  RecordField(UpdateCost,M4Int,0,0);
+  RecordField(ItemFormulaeInclVAT,M4Int,0,0);
+  RecordField(SumupItemQty,M4Int,0,0);
+  RecordField(BatchStatus,M4Int,0,0);
+  RecordField(EnCalcDimQty,M4Int,0,0);
+  RecordField(UpdCurPrWithDate,M4Int,0,0);
+  RecordField(YourBarCodeDef,M4Str,20,0);
+  RecordField(BarCodeStartFrom,M4Str,20,0);
+  RecordField(DemandItemGroup,M4Int,0,0);
+  RecordField(WarrantyLength,M4UVal,0,0);
+  RecordField(SerNrf,M4Int,0,0);
+  RecordField(Unittext,M4Str,10,0);
+  RecordField(SRUpdateCost,M4Int,0,0);
+  RecordField(Perceptions,M4Int,0,0);
+  RecordField(Withholdings,M4Int,0,0);
+  RecordField(UseSupersessionIN,M4Int,0,0);
+  RecordField(MultiBuyDiscount,M4Int,0,0); // not used
+  RecordField(ClassType,M4Code,10,0); //EBS
+  EndBlock;
+
+  return;
+end;

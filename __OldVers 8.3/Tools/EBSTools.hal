@@ -1,0 +1,38 @@
+
+global
+function Boolean PriceRClassOnOKWindow(Integer wn)
+begin
+  Boolean res;
+  record RcVc RepSpec;
+
+  res = true;
+  DeselectWindow(wn,true);
+  GetWindowRecord(wn,RepSpec);
+  if RepSpec.flags[2]==3 and blank(RepSpec.f12) then begin
+    res = false;
+    MessageBox(1000001,"");
+    GoTo LPriceRClassOnOKWindow;
+  end;
+
+LPriceRClassOnOKWindow:;
+  PriceRClassOnOKWindow = res;
+  return;
+end;
+
+global
+procedure EBS_GetAllClasses(string classtype,var array string arrClasses) begin
+  record DIVc DIr;
+  boolean wloop;
+
+  DIr.CType = classtype;
+  wloop = true;
+  While LoopKey("CType",DIr,1,wloop) begin
+    if DIr.CType != classtype then begin
+      wloop = false;
+    end else begin
+      arrClasses[arrClasses.length] = DIr.Code;
+    end;
+  end;
+
+  return;
+end;

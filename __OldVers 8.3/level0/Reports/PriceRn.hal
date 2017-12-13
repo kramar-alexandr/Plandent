@@ -20,11 +20,11 @@ external procedure GetItemVATCode(string,Integer,var string,Boolean);
 external function Boolean GetItemNameStr(Integer,var string,string,string,string);
 external procedure HTSort1(Integer, var string);
 external procedure HTArtSel(string,string,var string);
-external procedure ExtractObj(string,var Integer,var string); //EBS// Edit ************************** BPI Ukraine - KramarAlexandr - Wednesday, 13 December 2017 16:12:57
-external procedure ClassTypef(string,string,var boolean); //EBS// Edit ************************** BPI Ukraine - KramarAlexandr - Wednesday, 13 December 2017 16:12:58
-external outer procedure EBS_GetAllClasses(string,var array string); //EBS// Edit ************************** BPI Ukraine - KramarAlexandr - Wednesday, 13 December 2017 16:12:58
+external procedure ExtractObj(string,var Integer,var string); //EBS
+external procedure ClassTypef(string,string,var boolean); //EBS
+external outer procedure EBS_GetAllClasses(string,var array string); //EBS
 
-//EBS -->// Edit ************************** BPI Ukraine - KramarAlexandr - Wednesday, 13 December 2017 16:13:00
+//EBS -->
 function
 Boolean GetUnitName(record UnitVc ITp,string langcod2,var string tstr)
 BEGIN
@@ -86,7 +86,7 @@ begin
   Boolean res;
   record ItemStatusVc ISr;
   Boolean found;
-  record PLVc PLr;  
+  record PLVc PLr;
 
   ISr.Location = ";;;";
   ISr.Code = INr.Code;
@@ -103,17 +103,17 @@ begin
       end;
     end;
   end;
-LAnyVarietyInPriceList:;  
+LAnyVarietyInPriceList:;
   AnyVarietyInPriceList = res;
   return;
-end;            
+end;
 
 procedure AddToArray(string pricelist,string rebcode,array string apldef)
 begin
   Integer i;
   string 255 pl,reb;
   LongInt pos;
-  
+
   for (i=0;i<apldef.length;i=i+1) begin
     pos = 0;
     GetNextSubstring(apldef[i],pos,",",pl);
@@ -127,7 +127,7 @@ begin
   end else begin
     apldef[apldef.length] = pricelist & "," & rebcode;
   end;
-LAddToArray:;  
+LAddToArray:;
   return;
 end;
 
@@ -143,7 +143,7 @@ begin
   if (qty==0) then begin
     goto LPrintQtyDependentDiscountDetails;
   end;
-  RecordCopy(tINr,INr); 
+  RecordCopy(tINr,INr);
   if (GetItemPriceDiscount3(tINr.Code,qty,tINr,"",blankval,blankval,blankval,blankval,blankval,
       "","",pldef,rebcode,
       upric,curitemname,reb,
@@ -151,7 +151,7 @@ begin
       CurrentDate,blankt,"",true,dummyf,"",tax2code,tax2prc,"","",taxtemplatecode)) then begin
 
     CalcPrice(upric,blankval,reb,upric,GOb.UseDiscount);
-    CalcSum(qty,upric,blankval,reb,upric,GOb.UseDiscount);  
+    CalcSum(qty,upric,blankval,reb,upric,GOb.UseDiscount);
     upric = Round(upric/qty,SetRoundModeD(2));
 
     if (vatflag==0) then begin
@@ -169,10 +169,10 @@ begin
       OutVal(3,0,qty,M4Val,false);
       if (RepSpec.flags[9]==1) then begin
         OutVal(4,0,upric,M423Val,true);
-      end;  
+      end;
       if (RepSpec.flags[8]==1) then begin
         OutVal(1,0,upricv,M423Val,true);
-      end;  
+      end;
       EndFormat;
     end else begin
       StartFormat(15);
@@ -182,7 +182,7 @@ begin
         OutVal(270,0,upricv,M423Val,true);
       end else begin
         OutVal(270,0,upric,M423Val,true);
-      end;  
+      end;
       OutVal(345,0,INr.InPrice,M423Val,true);
       t2 = upric - INr.InPrice;
       OutVal(420,0,t2,M423Val,true);
@@ -194,7 +194,7 @@ begin
 
     end;
   end;
-LPrintQtyDependentDiscountDetails:;      
+LPrintQtyDependentDiscountDetails:;
   return;
 end;
 
@@ -208,7 +208,7 @@ begin
   Integer i,r,rwcnt;
   Boolean foundp;
   Boolean foundr;
-  Boolean qtydepf,testf;
+  Boolean qtydepf;
   array string 255 apldef;
   string 255 pldef,rebcode;
   string 255 tax2code,taxtemplatecode,salesacc,vatcode,curitemname;
@@ -234,18 +234,12 @@ begin
     EndFormat;
     Gray_Divider(120,1);
   end;
-  BlockLoad(GOb);  
+  BlockLoad(GOb);
   foundp = true;
   while (LoopMain(PLDefr,1,foundp)) begin
     if (foundp) then begin
-      if (nonblank(RepSpec.f2)) then begin
-        foundr = PLDefr.Code==RepSpec.f2;
-      end else begin
-        foundr = true;
-      end;
-      if (foundr) then begin
-        AddToArray(PLDefr.Code,"",apldef);
-      end;
+      AddToArray(PLDefr.Code,"",apldef);
+      foundr = true;
       RecordClear(Rebr);
       ResetLoop(Rebr);
       while (LoopMain(Rebr,1,foundr)) begin
@@ -254,24 +248,18 @@ begin
           if (rwcnt==0) then begin
             AddToArray(PLDefr.Code,Rebr.Code,apldef);
           end else begin
-            testf = true;
             for (r=0;r<rwcnt;r=r+1) begin
               MatRowGet(Rebr,r,Rebrw);
               switch (Rebrw.CodeType) begin
                 case kPLDefRowTypeItemGroup:
                   if (INr.Group==Rebrw.ITCode) then begin
                     AddToArray(PLDefr.Code,Rebr.Code,apldef);
-                    testf = false;
                   end;
                 case kPLDefRowTypeItem:
                   if (INr.Code==Rebrw.ITCode) then begin
                     AddToArray(PLDefr.Code,Rebr.Code,apldef);
-                    testf = false;
                   end;
               end;
-            end;
-            if (testf) then begin
-              AddToArray(PLDefr.Code,Rebr.Code,apldef);
             end;
           end;
         end;
@@ -286,73 +274,19 @@ begin
       AddToArray("",Rebr.Code,apldef);
     end;
   end;
-  RecordCopy(tINr,INr); 
+  RecordCopy(tINr,INr);
   for (i=0;i<apldef.length;i=i+1) begin
     pos = 0;
     GetNextSubstring(apldef[i],pos,",",pldef);
     if (pldef=="BLANKPRICELIST") then begin pldef = ""; end;
     GetNextSubstring(apldef[i],pos,",",rebcode);
-    testf = true;
-    if (nonblank(RepSpec.f2)) then begin
-      if (pldef!=RepSpec.f2) then begin testf = false; end;
-    end;
-    if (blank(rebcode)) then begin testf = false; end;
-
-    if (testf) then begin
+    if (nonblank(rebcode)) then begin
       Rebr.Code = rebcode;
       ReadFirstMain(Rebr,1,true);
       Staffr.Code = Rebr.StaffCode;
       qtydepf = ReadFirstMain(Staffr,1,true);
       rwcnt = MatRowCnt(Rebr);
-      testf = true;      
-      for (r=0;r<rwcnt;r=r+1) begin
-        MatRowGet(Rebr,r,Rebrw);
-        switch (Rebrw.CodeType) begin
-          case kPLDefRowTypeItemGroup:
-            if (INr.Group==Rebrw.ITCode) then begin
-              testf = false;
-              if (nonblank(Rebrw.StaffCode)) then begin
-                Staffr.Code = Rebrw.StaffCode;
-                qtydepf = ReadFirstMain(Staffr,1,true);
-              end;
-              if (nonblank(Staffr.Code)) then begin
-                PrintQtyDependentDiscountDetails(RepSpec,GOb,INr,Staffr.Lim1,pldef,rebcode,vatflag,vatc);
-                PrintQtyDependentDiscountDetails(RepSpec,GOb,INr,Staffr.Lim2,pldef,rebcode,vatflag,vatc);
-                PrintQtyDependentDiscountDetails(RepSpec,GOb,INr,Staffr.Lim3,pldef,rebcode,vatflag,vatc);
-                PrintQtyDependentDiscountDetails(RepSpec,GOb,INr,Staffr.Lim4,pldef,rebcode,vatflag,vatc);
-                PrintQtyDependentDiscountDetails(RepSpec,GOb,INr,Staffr.Lim5,pldef,rebcode,vatflag,vatc);
-                PrintQtyDependentDiscountDetails(RepSpec,GOb,INr,Staffr.Lim6,pldef,rebcode,vatflag,vatc);
-                PrintQtyDependentDiscountDetails(RepSpec,GOb,INr,Staffr.Lim7,pldef,rebcode,vatflag,vatc);
-                PrintQtyDependentDiscountDetails(RepSpec,GOb,INr,Staffr.Lim8,pldef,rebcode,vatflag,vatc);
-                PrintQtyDependentDiscountDetails(RepSpec,GOb,INr,Staffr.Lim9,pldef,rebcode,vatflag,vatc);
-              end else begin
-                PrintQtyDependentDiscountDetails(RepSpec,GOb,INr,1,pldef,rebcode,vatflag,vatc);
-              end;
-            end;
-          case kPLDefRowTypeItem:
-            if (INr.Code==Rebrw.ITCode) then begin
-              testf = false;
-              if (nonblank(Rebrw.StaffCode)) then begin
-                Staffr.Code = Rebrw.StaffCode;
-                qtydepf = ReadFirstMain(Staffr,1,true);
-              end;
-              if (nonblank(Staffr.Code)) then begin
-                PrintQtyDependentDiscountDetails(RepSpec,GOb,INr,Staffr.Lim1,pldef,rebcode,vatflag,vatc);
-                PrintQtyDependentDiscountDetails(RepSpec,GOb,INr,Staffr.Lim2,pldef,rebcode,vatflag,vatc);
-                PrintQtyDependentDiscountDetails(RepSpec,GOb,INr,Staffr.Lim3,pldef,rebcode,vatflag,vatc);
-                PrintQtyDependentDiscountDetails(RepSpec,GOb,INr,Staffr.Lim4,pldef,rebcode,vatflag,vatc);
-                PrintQtyDependentDiscountDetails(RepSpec,GOb,INr,Staffr.Lim5,pldef,rebcode,vatflag,vatc);
-                PrintQtyDependentDiscountDetails(RepSpec,GOb,INr,Staffr.Lim6,pldef,rebcode,vatflag,vatc);
-                PrintQtyDependentDiscountDetails(RepSpec,GOb,INr,Staffr.Lim7,pldef,rebcode,vatflag,vatc);
-                PrintQtyDependentDiscountDetails(RepSpec,GOb,INr,Staffr.Lim8,pldef,rebcode,vatflag,vatc);
-                PrintQtyDependentDiscountDetails(RepSpec,GOb,INr,Staffr.Lim9,pldef,rebcode,vatflag,vatc);
-              end else begin
-                PrintQtyDependentDiscountDetails(RepSpec,GOb,INr,1,pldef,rebcode,vatflag,vatc);
-              end;
-            end;
-        end;
-      end;
-      if (testf) then begin
+      if (rwcnt==0) then begin
         if (nonblank(Staffr.Code)) then begin
           PrintQtyDependentDiscountDetails(RepSpec,GOb,INr,Staffr.Lim1,pldef,rebcode,vatflag,vatc);
           PrintQtyDependentDiscountDetails(RepSpec,GOb,INr,Staffr.Lim2,pldef,rebcode,vatflag,vatc);
@@ -366,25 +300,65 @@ begin
         end else begin
           PrintQtyDependentDiscountDetails(RepSpec,GOb,INr,1,pldef,rebcode,vatflag,vatc);
         end;
+      end else begin
+        for (r=0;r<rwcnt;r=r+1) begin
+          MatRowGet(Rebr,r,Rebrw);
+          switch (Rebrw.CodeType) begin
+            case kPLDefRowTypeItemGroup:
+              if (INr.Group==Rebrw.ITCode) then begin
+                if (nonblank(Rebrw.StaffCode)) then begin
+                  Staffr.Code = Rebrw.StaffCode;
+                  qtydepf = ReadFirstMain(Staffr,1,true);
+                end;
+                if (nonblank(Staffr.Code)) then begin
+                  PrintQtyDependentDiscountDetails(RepSpec,GOb,INr,Staffr.Lim1,pldef,rebcode,vatflag,vatc);
+                  PrintQtyDependentDiscountDetails(RepSpec,GOb,INr,Staffr.Lim2,pldef,rebcode,vatflag,vatc);
+                  PrintQtyDependentDiscountDetails(RepSpec,GOb,INr,Staffr.Lim3,pldef,rebcode,vatflag,vatc);
+                  PrintQtyDependentDiscountDetails(RepSpec,GOb,INr,Staffr.Lim4,pldef,rebcode,vatflag,vatc);
+                  PrintQtyDependentDiscountDetails(RepSpec,GOb,INr,Staffr.Lim5,pldef,rebcode,vatflag,vatc);
+                  PrintQtyDependentDiscountDetails(RepSpec,GOb,INr,Staffr.Lim6,pldef,rebcode,vatflag,vatc);
+                  PrintQtyDependentDiscountDetails(RepSpec,GOb,INr,Staffr.Lim7,pldef,rebcode,vatflag,vatc);
+                  PrintQtyDependentDiscountDetails(RepSpec,GOb,INr,Staffr.Lim8,pldef,rebcode,vatflag,vatc);
+                  PrintQtyDependentDiscountDetails(RepSpec,GOb,INr,Staffr.Lim9,pldef,rebcode,vatflag,vatc);
+                end else begin
+                  PrintQtyDependentDiscountDetails(RepSpec,GOb,INr,1,pldef,rebcode,vatflag,vatc);
+                end;
+              end;
+            case kPLDefRowTypeItem:
+              if (INr.Code==Rebrw.ITCode) then begin
+                if (nonblank(Rebrw.StaffCode)) then begin
+                  Staffr.Code = Rebrw.StaffCode;
+                  qtydepf = ReadFirstMain(Staffr,1,true);
+                end;
+                if (nonblank(Staffr.Code)) then begin
+                  PrintQtyDependentDiscountDetails(RepSpec,GOb,INr,Staffr.Lim1,pldef,rebcode,vatflag,vatc);
+                  PrintQtyDependentDiscountDetails(RepSpec,GOb,INr,Staffr.Lim2,pldef,rebcode,vatflag,vatc);
+                  PrintQtyDependentDiscountDetails(RepSpec,GOb,INr,Staffr.Lim3,pldef,rebcode,vatflag,vatc);
+                  PrintQtyDependentDiscountDetails(RepSpec,GOb,INr,Staffr.Lim4,pldef,rebcode,vatflag,vatc);
+                  PrintQtyDependentDiscountDetails(RepSpec,GOb,INr,Staffr.Lim5,pldef,rebcode,vatflag,vatc);
+                  PrintQtyDependentDiscountDetails(RepSpec,GOb,INr,Staffr.Lim6,pldef,rebcode,vatflag,vatc);
+                  PrintQtyDependentDiscountDetails(RepSpec,GOb,INr,Staffr.Lim7,pldef,rebcode,vatflag,vatc);
+                  PrintQtyDependentDiscountDetails(RepSpec,GOb,INr,Staffr.Lim8,pldef,rebcode,vatflag,vatc);
+                  PrintQtyDependentDiscountDetails(RepSpec,GOb,INr,Staffr.Lim9,pldef,rebcode,vatflag,vatc);
+                end else begin
+                  PrintQtyDependentDiscountDetails(RepSpec,GOb,INr,1,pldef,rebcode,vatflag,vatc);
+                end;
+              end;
+          end;
+        end;
       end;
     end else begin
-      testf = true;
-      if (nonblank(RepSpec.f2)) then begin
-        if (pldef!=RepSpec.f2) then begin testf = false; end;
-      end;
-      if (testf) then begin
-        PrintQtyDependentDiscountDetails(RepSpec,GOb,INr,1,pldef,rebcode,vatflag,vatc);
-      end;
+      PrintQtyDependentDiscountDetails(RepSpec,GOb,INr,1,pldef,rebcode,vatflag,vatc);
     end;
-Lskip:;    
+Lskip:;
   end;
   return;
-end;            
+end;
 
 procedure FindPriceListPrice(record RcVc RepSpec,record INVc INr,string artcode,Boolean varf,string pricelist,string curncycode,var val upric,var Boolean plhit,var Boolean pricelistf)
 begin
-  record PLVc PLr;  
-    
+  record PLVc PLr;
+
   plhit = false;
   PLr.PLCode = pricelist;
   if (RepSpec.flags[7]!=0) then begin
@@ -414,8 +388,8 @@ begin
       plhit = AnyVarietyInPriceList(INr,pricelist);
     end;
   end;
-  if (plhit) then begin 
-    upric = PLr.ExVatPrice;           
+  if (plhit) then begin
+    upric = PLr.ExVatPrice;
     if (RepSpec.flags[6]==1) then begin
        upric = DivWithRateToBase1(curncycode,CurrentDate,upric,DefaultCurRoundOff);
     end;
@@ -425,8 +399,9 @@ begin
     plhit = true;
   end;
   return;
-end;           
-//EBS -->// Edit ************************** BPI Ukraine - KramarAlexandr - Wednesday, 13 December 2017 16:17:38
+end;
+
+//EBS -->
 procedure SortAndPrintArrays(record RcVc RepSpec,var integer count,var array string itemcode,var array string clase,var array val suVAT,var array val beVAT)
 begin
   record INVc INr2;
@@ -659,10 +634,9 @@ begin
 
   return;
 end;
-//EBS <--// Edit ************************** BPI Ukraine - KramarAlexandr - Wednesday, 13 December 2017 16:17:33
- 
+//EBS <--
 
-procedure PrintItemPrice(record RcVc RepSpec,Integer depprice,string artcode,record INVc INr,Boolean varf,string curncycode,Integer vatflag,
+procedure PrintItemPrice(record RcVc RepSpec,string artcode,record INVc INr,Boolean varf,string curncycode,Integer vatflag,
                          var Boolean itemout,var string lastgroup)
 begin
   val upricv;
@@ -670,7 +644,7 @@ begin
   Boolean plhit,pricelistf;
   string 200 namestr,vatc,tstr,pricelist,cupl;
   record ITVc ITr;
-  
+
 
   if (nonblank(RepSpec.f2)) begin
     pricelist = RepSpec.f2;
@@ -687,14 +661,8 @@ begin
   pricelistf = false;
   if (nonblank(pricelist)) begin
     FindPriceListPrice(RepSpec,INr,artcode,varf,pricelist,curncycode,upric,plhit,pricelistf);
-    if (depprice==2) then begin
-      if (blank(upric)) then begin
-        upric = INr.UPrice1;
-      end;
-    end;
-
   end;
-  
+
   if (plhit) then begin
     if (vatflag==0) then begin
       upricv = FindVAT(vatc,upric,0,0);
@@ -712,13 +680,13 @@ begin
         upricv = DivWithRateToBase1(curncycode,CurrentDate,upricv,DefaultCurRoundOff);
       end;
     end;
-  end;        
-  if (RepSpec.flags[4]<>0) then begin 
+  end;
+  if (RepSpec.flags[4]<>0) then begin
     if (GetStockQty(artcode,"",CurrentDate,false)==0) then begin
-      plhit = false; 
+      plhit = false;
     end;
     if (upric==0) then begin
-      plhit = false; 
+      plhit = false;
     end;
   end;
   if (plhit) then begin
@@ -727,7 +695,7 @@ begin
         if (lastgroup<>INr.Group) then begin
           if (itemout==true) then begin
             Gray_Divider(0,1);
-          end;  
+          end;
           StartFormat(15);
           OutString(20,0,INr.Group,false);
           GetITName(INr.Group,RepSpec.Stext,tstr);
@@ -736,17 +704,17 @@ begin
           Gray_Divider(0,1);
           lastgroup = INr.Group;
         end;
-      end;   
+      end;
       StartFormat(15);
       OutString(0,"DblINVc",artcode,false);
       OutString(2,0,namestr,false);
       OutString(3,0,INr.Unittext,false);
       if (RepSpec.flags[9]==1) then begin
         OutVal(4,0,upric,M423Val,true);
-      end;  
+      end;
       if (RepSpec.flags[8]==1) then begin
         OutVal(1,0,upricv,M423Val,true);
-      end;  
+      end;
       EndFormat;
       if (RepSpec.flags[10]!=0) then begin
         PrintQtyDependentDiscount(RepSpec,INr,vatflag,vatc);
@@ -757,18 +725,18 @@ begin
         if (lastgroup<>INr.Group) then begin
           if (itemout==true) then begin
             Gray_Divider(0,1);
-          end;  
+          end;
           StartFormat(15);
           OutString(20,0,INr.Group,false);
           ITr.Code = INr.Group;
           if (ReadFirstMain(ITr,1,true)) then begin
             OutString(100,0,ITr.Comment,false);
-          end;  
+          end;
           EndFormat;
           Gray_Divider(0,1);
           lastgroup=INr.Group;
         end;
-      end;          
+      end;
       StartFormat(15);
       OutString(0,"DblINVc",artcode,false);
       OutString(60,0,namestr,false);
@@ -776,7 +744,7 @@ begin
         OutVal(270,0,upricv,M423Val,true);
       end else begin
         OutVal(270,0,upric,M423Val,true);
-      end;  
+      end;
       OutVal(345,0,INr.InPrice,M423Val,true);
       t2 = upric - INr.InPrice;
       OutVal(420,0,t2,M423Val,true);
@@ -790,10 +758,10 @@ begin
       end;
     end;
   end;
-  return;  
-end;            
+  return;
+end;
 
-procedure PrintItemWithOneVariety(string group,record RcVc RepSpec,Integer depprice,record INVc INr,Boolean varf,string curncycode,Integer vatflag,string itsz,string mask,string mskrep,string subsets,
+procedure PrintItemWithOneVariety(string group,record RcVc RepSpec,record INVc INr,Boolean varf,string curncycode,Integer vatflag,string itsz,string mask,string mskrep,string subsets,
                                  var Boolean itemout,var string lastgroup)
 begin
   record VARVc VARr;
@@ -818,7 +786,7 @@ begin
         artcode = itemcode & VARr.Code;
       end else begin
         artcode = itemcode & itsz & VARr.Code;
-      end;      
+      end;
       testf = true;
       if (nonblank(subsets)) then begin
         if (CheckVARSubsets(VARr,subsets,mask)==false) then begin
@@ -827,14 +795,14 @@ begin
       end;
       if (testf) then begin
         INr.Name = tmpINr.Name & ", "  & VARr.Comment;
-        PrintItemPrice(RepSpec,depprice,artcode,INr,varf,curncycode,vatflag,itemout,lastgroup);        
+        PrintItemPrice(RepSpec,artcode,INr,varf,curncycode,vatflag,itemout,lastgroup);
       end;
     end;
   end;
   return;
 end;
-      
-procedure PrintItemWithTwoVarieties(string group1,string group2,record RcVc RepSpec,Integer depprice,record INVc INr,Boolean varf,string curncycode,Integer vatflag,string itsz,string mask,string mskrep,string subsets,
+
+procedure PrintItemWithTwoVarieties(string group1,string group2,record RcVc RepSpec,record INVc INr,Boolean varf,string curncycode,Integer vatflag,string itsz,string mask,string mskrep,string subsets,
                                  var Boolean itemout,var string lastgroup)
 begin
   record VARVc VARr1;
@@ -865,7 +833,7 @@ begin
         artcode = itemcode & VARr1.Code;
       end else begin
         artcode = itemcode & itsz1 & VARr1.Code;
-      end;      
+      end;
       artcode1 = artcode;
       testf = true;
       if (nonblank(subsets)) then begin
@@ -873,7 +841,7 @@ begin
           testf = false;
         end;
       end;
-      
+
       if (testf) then begin
         ResetLoop(VARr2);
         found2 = true;
@@ -882,7 +850,7 @@ begin
           if (VARr2.VARGCode!=group2) then begin
             found2 = false;
           end;
-          if (found2) then begin  
+          if (found2) then begin
             artcode = artcode1;
             VARGr.Code = VARr2.VARGCode;
             ReadFIrstMain(VARGr,1,true);
@@ -894,7 +862,7 @@ begin
               artcode = artcode & VARr2.Code;
             end else begin
               artcode = artcode & itsz2 & VARr2.Code;
-            end;      
+            end;
             tmpINr.Code = artcode;
             testf = true;
             if (nonblank(subsets)) then begin
@@ -904,7 +872,7 @@ begin
             end;
             if (testf) then begin
               INr.Name = tmpINr.Name & ", "  & VARr1.Comment & ", "  & VARr2.Comment;
-              PrintItemPrice(RepSpec,depprice,artcode,INr,varf,curncycode,vatflag,itemout,lastgroup);        
+              PrintItemPrice(RepSpec,artcode,INr,varf,curncycode,vatflag,itemout,lastgroup);
             end;
           end;
         end;
@@ -914,7 +882,7 @@ begin
   return;
 end;
 
-procedure PrintItemWithThreeVarieties(string group1,string group2,string group3,record RcVc RepSpec,Integer depprice,record INVc INr,Boolean varf,string curncycode,Integer vatflag,string itsz,string mask,string mskrep,string subsets,
+procedure PrintItemWithThreeVarieties(string group1,string group2,string group3,record RcVc RepSpec,record INVc INr,Boolean varf,string curncycode,Integer vatflag,string itsz,string mask,string mskrep,string subsets,
                                    var Boolean itemout,var string lastgroup)
 begin
   record VARVc VARr1;
@@ -947,7 +915,7 @@ begin
         artcode = itemcode & VARr1.Code;
       end else begin
         artcode = itemcode & itsz1 & VARr1.Code;
-      end;      
+      end;
       artcode1 = artcode;
       testf = true;
       if (nonblank(subsets)) then begin
@@ -963,7 +931,7 @@ begin
           if (VARr2.VARGCode!=group2) then begin
             found2 = false;
           end;
-          if (found2) then begin  
+          if (found2) then begin
             artcode = artcode1;
             VARGr.Code = VARr2.VARGCode;
             ReadFIrstMain(VARGr,1,true);
@@ -975,7 +943,7 @@ begin
               artcode = artcode & VARr2.Code;
             end else begin
               artcode = artcode & itsz2 & VARr2.Code;
-            end;      
+            end;
             artcode2 = artcode;
 
             testf = true;
@@ -1004,7 +972,7 @@ begin
                     artcode = artcode & VARr3.Code;
                   end else begin
                     artcode = artcode & itsz2 & VARr3.Code;
-                  end;      
+                  end;
                   tmpINr.Code = artcode;
                   testf = true;
                   if (nonblank(subsets)) then begin
@@ -1014,7 +982,7 @@ begin
                   end;
                   if (testf) then begin
                     INr.Name = tmpINr.Name & ", "  & VARr1.Comment & ", "  & VARr2.Comment & ", "  & VARr3.Comment;
-                    PrintItemPrice(RepSpec,depprice,artcode,INr,varf,curncycode,vatflag,itemout,lastgroup);        
+                    PrintItemPrice(RepSpec,artcode,INr,varf,curncycode,vatflag,itemout,lastgroup);
                   end;
                 end;
               end;
@@ -1026,8 +994,8 @@ begin
   end;
   return;
 end;
-        
-procedure PrintItemVarietiesPrice(record RcVc RepSpec,Integer depprice,record INVc INr,Boolean varf,string curncycode,Integer vatflag,string sz,string mask,string mskrep,string subsets,
+
+procedure PrintItemVarietiesPrice(record RcVc RepSpec,record INVc INr,Boolean varf,string curncycode,Integer vatflag,string sz,string mask,string mskrep,string subsets,
                                   var Boolean itemout,var string lastgroup)
 begin
   Boolean found;
@@ -1057,9 +1025,9 @@ begin
 
   nrofy = FindYVars(ypos,subsets,mask);
   switch (cnt) begin
-    case 1: PrintItemWithOneVariety(xpos,RepSpec,depprice,INr,varf,curncycode,vatflag,sz,mask,mskrep,subsets,itemout,lastgroup);
-    case 2: PrintItemWithTwoVarieties(xpos,ypos,RepSpec,depprice,INr,varf,curncycode,vatflag,sz,mask,mskrep,subsets,itemout,lastgroup);
-    case 3: PrintItemWithThreeVarieties(xpos,ypos,zpos,RepSpec,depprice,INr,varf,curncycode,vatflag,sz,mask,mskrep,subsets,itemout,lastgroup);
+    case 1: PrintItemWithOneVariety(xpos,RepSpec,INr,varf,curncycode,vatflag,sz,mask,mskrep,subsets,itemout,lastgroup);
+    case 2: PrintItemWithTwoVarieties(xpos,ypos,RepSpec,INr,varf,curncycode,vatflag,sz,mask,mskrep,subsets,itemout,lastgroup);
+    case 3: PrintItemWithThreeVarieties(xpos,ypos,zpos,RepSpec,INr,varf,curncycode,vatflag,sz,mask,mskrep,subsets,itemout,lastgroup);
   end;
   return;
 end;
@@ -1085,10 +1053,9 @@ begin
   Boolean testf,pldeff;
   Boolean TrHs;
   Boolean varf;
-  string 60 sz,msk,mskrep;  
-  string 200 varsubset; 
-  Integer depprice; 
-  //EBS -->// Edit ************************** BPI Ukraine - KramarAlexandr - Wednesday, 13 December 2017 16:15:17
+  string 60 sz,msk,mskrep;
+  string 200 varsubset;
+  //EBS -->
   string 20 curclass;
   integer count,classCnt;
   Array string 20 itemcode,clase,arrClasses;
@@ -1111,8 +1078,7 @@ begin
       end;
     end else begin
       pldeff = true;
-    end; 
-    depprice = PLDefr.DepPrice;
+    end;
   end else begin
     BlockLoad(ARb);
     vatflag = ARb.BasePriceInclVAT;
@@ -1123,26 +1089,27 @@ begin
   rw=rw+1;
   HTSort1(RepSpec.flags[2],tstr);
   Header(rw,tstr,1);
-  rw = rw+1;    
+  rw = rw+1;
   if (nonblank(RepSpec.AccStr)) then begin
     tstr = USetStr(1156);
     tstr = tstr & RepSpec.AccStr;
     Header(rw,tstr,1);
-    rw = rw + 1; 
+    rw = rw + 1;
   end;
   if (nonblank(RepSpec.f2)) then begin
     tstr = USetStr(2321);
     tstr = tstr & ": ";
     tstr = tstr & RepSpec.f2;
     Header(rw,tstr,1);
+  end;
+  if (nonblank(RepSpec.f5)) then begin
+    HTCusts(frcu,tocu,tstr);
+    Header(rw,tstr,1);
     rw = rw + 1;
   end;
-  HTCusts(RepSpec.f5,RepSpec.f5,tstr);
-  Header(rw,tstr,1);
-  rw = rw + 1;
   EndHeader;
   SetRepCol(2,90);
-  SetRepCol(3,350); //EBS edit// Edit ************************** BPI Ukraine - KramarAlexandr - Wednesday, 13 December 2017 16:15:35
+  SetRepCol(3,350); //EBS edit
   SetRepCol(4,420); //EBS edit
   if (pldeff) then begin
     StartFormat(15);
@@ -1154,7 +1121,7 @@ begin
   if (RepSpec.flags[3]==0) then begin
     OutString(0,0,USetStr(2325),false);
     OutString(2,0,USetStr(2326),false);
-    //EBS -->// Edit ************************** BPI Ukraine - KramarAlexandr - Wednesday, 13 December 2017 16:15:45
+    //EBS -->
     if RepSpec.flags[2]==1 then begin
       OutString(200,0,USetStr(1000002),false);
   	  OutString(280,0,USetStr(1000004),false);
@@ -1180,7 +1147,7 @@ begin
     OutString(480,0,USetStr(5402),true);
   end;
   EndFormat;
-  //EBS -->// Edit ************************** BPI Ukraine - KramarAlexandr - Wednesday, 13 December 2017 16:16:03
+  //EBS -->
   EBS_GetAllClasses(RepSpec.f12,arrClasses);
 LStartINLoop:; //Used to loop through classes with type
   if (RepSpec.flags[2]==3) then begin
@@ -1225,22 +1192,22 @@ LStartINLoop:; //Used to loop through classes with type
             if (INr.Group>toit) then begin
               testf = false;
             end;
-          end;  
-        end;    
+          end;
+        end;
         if (TrHs) then begin
           if (nonblank(frit)) then begin
             if (INr.Group<frit) then begin
               testf = false;
             end;
           end;
-        end;      
+        end;
         if (TrHs) then begin
           if (nonblank(toart)) then begin
             if (INr.Code>toart) then begin
               TrHs = false;
             end;
           end;
-        end;      
+        end;
       end;
       if (RepSpec.flags[2]==1) then begin
         if (TrHs) then begin
@@ -1249,21 +1216,21 @@ LStartINLoop:; //Used to loop through classes with type
               TrHs = false;
             end;
           end;
-        end;      
+        end;
         if (TrHs) then begin
           if (nonblank(toart)==true) then begin
             if (INr.Code>toart) then begin
               testf = false;
             end;
           end;
-        end;      
+        end;
         if (TrHs) then begin
           if (nonblank(fromart)==true) then begin
             if (INr.Code<fromart) then begin
               testf = false;
             end;
           end;
-        end;      
+        end;
       end;
       if (RepSpec.flags[2]==2) then begin
         if (TrHs) then begin
@@ -1272,28 +1239,28 @@ LStartINLoop:; //Used to loop through classes with type
               testf = false;
             end;
           end;
-        end;      
+        end;
         if (TrHs) then begin
           if (nonblank(frit)) then begin
             if (INr.Group<frit) then begin
               testf = false;
             end;
           end;
-        end;      
+        end;
         if (TrHs) then begin
           if (nonblank(toart)) then begin
             if (INr.Code>toart) then begin
               testf = false;
             end;
           end;
-        end;      
+        end;
         if (TrHs) then begin
           if (nonblank(fromart)) then begin
             if (INr.Code<fromart) then begin
               testf = false;
             end;
           end;
-        end;      
+        end;
       end;
       if (nonblank(RepSpec.f4)) then begin
         if (INr.Department <> RepSpec.f4) then begin
@@ -1311,18 +1278,18 @@ LStartINLoop:; //Used to loop through classes with type
         varf = FindItemVAR(INr.Code,sz,msk,mskrep,varsubset);
         if (varf) then begin
           if (RepSpec.flags[7]!=0) then begin
-            PrintItemVarietiesPrice(RepSpec,depprice,INr,varf,curncycode,vatflag,sz,msk,mskrep,varsubset,itemout,lastgroup);
+            PrintItemVarietiesPrice(RepSpec,INr,varf,curncycode,vatflag,sz,msk,mskrep,varsubset,itemout,lastgroup);
           end else begin
-            //PrintItemPrice(RepSpec,depprice,INr.Code,INr,varf,curncycode,vatflag,itemout,lastgroup);      // Edit ************************** BPI Ukraine - KramarAlexandr - Wednesday, 13 December 2017 16:17:02  
-            EBS_PrintItemPrice(RepSpec,INr.Code,INr,varf,curncycode,vatflag,itemout,lastgroup,count,itemcode,clase,suVAT,beVAT);// Edit ************************** BPI Ukraine - KramarAlexandr - Wednesday, 13 December 2017 16:16:41
+            // PrintItemPrice(RepSpec,INr.Code,INr,varf,curncycode,vatflag,itemout,lastgroup);
+            EBS_PrintItemPrice(RepSpec,INr.Code,INr,varf,curncycode,vatflag,itemout,lastgroup,count,itemcode,clase,suVAT,beVAT);
           end;
         end else begin
-          //PrintItemPrice(RepSpec,depprice,INr.Code,INr,varf,curncycode,vatflag,itemout,lastgroup);        // Edit ************************** BPI Ukraine - KramarAlexandr - Wednesday, 13 December 2017 16:16:59
-          EBS_PrintItemPrice(RepSpec,INr.Code,INr,varf,curncycode,vatflag,itemout,lastgroup,count,itemcode,clase,suVAT,beVAT);// Edit ************************** BPI Ukraine - KramarAlexandr - Wednesday, 13 December 2017 16:16:58
+          // PrintItemPrice(RepSpec,INr.Code,INr,varf,curncycode,vatflag,itemout,lastgroup);
+          EBS_PrintItemPrice(RepSpec,INr.Code,INr,varf,curncycode,vatflag,itemout,lastgroup,count,itemcode,clase,suVAT,beVAT);
         end;
       end;
   end;
-  //EBS -->// Edit ************************** BPI Ukraine - KramarAlexandr - Wednesday, 13 December 2017 16:17:15
+  //EBS -->
   if (RepSpec.flags[2]==1) and (RepSpec.flags[3]!=1) then begin
     SortAndPrintArrays(RepSpec,count,itemcode,clase,suVAT,beVAT);
   end;
@@ -1334,6 +1301,6 @@ LStartINLoop:; //Used to loop through classes with type
   end;
   //EBS <--
 LLPriceRn:;
-  EndJob; 
-  return;  
-end;            
+  EndJob;
+  return;
+end;

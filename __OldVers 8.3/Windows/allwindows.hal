@@ -25,77 +25,73 @@ begin
   EditField(h,v,60,"Pagr. prekės grupė",Normal,DefIGroup,false,ITSClass);
   if (HasModSVO) then begin
     if (StandardHansa==false) then begin
-  EditField(h,v+=vs,60,"Garantijos galiojimas",Normal,WarrantyLength,false,0);
+      EditField(h,v+=vs,60,"Garantijos galiojimas",Normal,WarrantyLength,false,0);
     end;
-  EditField(h,v+=vs,60,"Vienetas",Normal,Unittext,false,UnitSCLass);
+    EditField(h,v+=vs,60,"Vienetas",Normal,Unittext,false,UnitSCLass);
   end;
   EditField(h,v+=vs,60,"Brūkšn. kodo ilgis (be čekio sumos)",Normal,BarCodeLength,false,0);
   EditField(h,v+=vs,60,"Pagrindinis klasės rūšiavimo tipas",Normal,ClassType,false,CTypeSClass); //EBS
   if (IsEnterprise and StandardHansa==false) then begin
-  EditField(h,v+=vs,120,"Priskirtas brūkšn. kodo nr.",Normal,YourBarCodeDef,false,0);
-  EditField(h,vm=(v+=vs),120,"Pradėti brūkšn. kodą nuo",Normal,BarCodeStartFrom,false,0);
+    EditField(h,v+=vs,120,"Priskirtas brūkšn. kodo nr.",Normal,YourBarCodeDef,false,0);
+    EditField(h,vm=(v+=vs),120,"Pradėti brūkšn. kodą nuo",Normal,BarCodeStartFrom,false,0);
   end else begin
     v = v+vs;
     vm = v;
   end;
   CheckBox(h=35,vm=(v=vm+25),0,"Unikalus barkodas",UniqueBarCode);
   if (IsEnterprise) then begin
-  CheckBox(h,v+=16,0,"Rodyti galiojimo laiką",BestBefore);
-  CheckBox(h,v+=16,0,"Rodyti siuntos būklę",BatchStatus);
-  CheckBox(h,v+=16,0,"Rodyti prekės būklę",ShowItemStatus);
+    CheckBox(h,v+=16,0,"Rodyti galiojimo laiką",BestBefore);
+    CheckBox(h,v+=16,0,"Rodyti siuntos būklę",BatchStatus);
+    CheckBox(h,v+=16,0,"Rodyti prekės būklę",ShowItemStatus);
   end;
   if (HasExtTax) then begin
-  CheckBox(h,v+=16,0,"Skaičiuoti percepcinius mokesčius",Perceptions);
+    CheckBox(h,v+=16,0,"Skaičiuoti percepcinius mokesčius",Perceptions);
   end;
   if (HasWithholdingTax) then begin
-  CheckBox(h,v+=16,0,"Skaičiuoti sulaikymo mokesčius",Withholdings);
+    CheckBox(h,v+=16,0,"Skaičiuoti sulaikymo mokesčius",Withholdings);
   end;
   if (IsEnterprise) then begin
-  CheckBox(h,v+=16,0,"Keičiant datą atnaujinti kainas įrašuose su valiuta",UpdCurPrWithDate);
-  CheckBox(h=250,v=vm,0,"Neleisti bazinės kainos pakeitimo",NoBasePriceChange);
+    CheckBox(h,v+=16,0,"Keičiant datą atnaujinti kainas įrašuose su valiuta",UpdCurPrWithDate);
+    CheckBox(h=250,v=vm,0,"Neleisti bazinės kainos pakeitimo",NoBasePriceChange);
     if (StandardHansa==false) then begin
-  CheckBox(h,v+=16,0,"Prekės formulė",ItemFormulaeInclVAT);
+      CheckBox(h,v+=16,0,"Prekės formulė",ItemFormulaeInclVAT);
     end;
-  CheckBox(h,v+=16,0,"Leisti kiekio skaičiavimą",EnCalcDimQty);
-  CheckBox(h,v+=16,0,"Reikalauti prekės grupės",DemandItemGroup);
+    CheckBox(h,v+=16,0,"Leisti kiekio skaičiavimą",EnCalcDimQty);
+    CheckBox(h,v+=16,0,"Reikalauti prekės grupės",DemandItemGroup);
     if (StandardHansa==false) then begin
-      if (HasWithholdingTax) then begin
-  CheckBox(h,v+=16,0,"Naudoti supersesijos prekes",UseSupersessionIN);
-      end else begin
-        CheckBox(h,v+=2*16,0,"Naudoti supersesijos prekes",UseSupersessionIN);
-      end;
+      CheckBox(h,v+=16,0,"Naudoti supersesijos prekes",UseSupersessionIN);
     end;
   //CheckBox(h,v+=16,0,"Naudoti kelių pirk. nuolaidą",MultiBuyDiscount);
     if (StandardHansa==false) then begin
-  ButtonFrame(h=35,vm=(v+=76),173,4,"Pagrindinis prekės tipas");
+      ButtonFrame(h=35,vm=(v+=76),173,4,"Pagrindinis prekės tipas");
     end else begin
-      ButtonFrame(h=35,vm=(v+=76),173,3,"Pagrindinis prekės tipas"); 
+      ButtonFrame(h=35,vm=(v+=76),173,3,"Pagrindinis prekės tipas");
     end;
-  RadioButton(h,v,0,0,"Paprasta",DefItemType);
-  RadioButton(h,v+=16,1,0,"Sandėliuojama",DefItemType);
-  RadioButton(h,v+=16,2,0,"Struktūrinė",DefItemType);
+    RadioButton(h,v,0,0,"Paprasta",DefItemType);
+    RadioButton(h,v+=16,1,0,"Sandėliuojama",DefItemType);
+    RadioButton(h,v+=16,2,0,"Struktūrinė",DefItemType);
     if (StandardHansa==false) then begin
-  RadioButton(h,v+=16,3,0,"Paslauga",DefItemType);
-  ButtonFrame(h,v+=40,173,3,"Serijinio nr. kontrolė");
+      RadioButton(h,v+=16,3,0,"Paslauga",DefItemType);
+      ButtonFrame(h,v+=40,173,3,"Serijinio nr. kontrolė");
     end else begin
-      ButtonFrame(h,v+=57,173,3,"Serijinio numerio kontrolė"); 
+      ButtonFrame(h,v+=57,173,3,"Serijinio numerio kontrolė");
     end;
-  RadioButton(h,v,0,0,"Nėra",SerNrf);
-  RadioButton(h,v+=16,1,0,"Vieneto",SerNrf);
-  RadioButton(h,v+=16,2,0,"Siuntos",SerNrf);
-  ButtonFrame(h=250,v=vm,200,4,"Atnaujinti savikainą patvirtinus gavimą");
-  RadioButton(h,v,0,0,"Nr.",UpdateCost);
-  RadioButton(h,v+=16,1,0,"Paskutinė pirkimų kaštai(su pap. kašt.)",UpdateCost);
-  RadioButton(h,v+=16,2,0,"Svertinis vidurkis",UpdateCost);
-  RadioButton(h,v+=16,3,0,"Pask. pirk. kaštai(be pap. kašt.)",UpdateCost);
-  ButtonFrame(h,v+=40,200,3,"Atnaujinti savik. Sand. perkainavimuose");
-  RadioButton(h,v,0,0,"Neatnaujinti",SRUpdateCost);
-  RadioButton(h,v+=16,1,0,"Paskutinio perkainavimo savik.",SRUpdateCost);
-  RadioButton(h,v+=16,2,0,"Svertinis vidurkis",SRUpdateCost);
+    RadioButton(h,v,0,0,"Nėra",SerNrf);
+    RadioButton(h,v+=16,1,0,"Vieneto",SerNrf);
+    RadioButton(h,v+=16,2,0,"Siuntos",SerNrf);
+    ButtonFrame(h=250,v=vm,200,4,"Atnaujinti savikainą patvirtinus gavimą");
+    RadioButton(h,v,0,0,"Nr.",UpdateCost);
+    RadioButton(h,v+=16,1,0,"Paskutinė pirkimų kaštai(su pap. kašt.)",UpdateCost);
+    RadioButton(h,v+=16,2,0,"Svertinis vidurkis",UpdateCost);
+    RadioButton(h,v+=16,3,0,"Pask. pirk. kaštai(be pap. kašt.)",UpdateCost);
+    ButtonFrame(h,v+=40,200,3,"Atnaujinti savik. Sand. perkainavimuose");
+    RadioButton(h,v,0,0,"Neatnaujinti",SRUpdateCost);
+    RadioButton(h,v+=16,1,0,"Paskutinio perkainavimo savik.",SRUpdateCost);
+    RadioButton(h,v+=16,2,0,"Svertinis vidurkis",SRUpdateCost);
   end else begin
-    CheckBox(h,v+=16,0,"Neleisti bazinių kainų keitimo",NoBasePriceChange); 
-    CheckBox(h,v+=16,0,"Prekės formulė",ItemFormulaeInclVAT); 
-    CheckBox(h,v+=16,0,"Reikalauti Prekės grupės",DemandItemGroup); 
+    CheckBox(h,v+=16,0,"Neleisti bazinių kainų keitimo",NoBasePriceChange);
+    CheckBox(h,v+=16,0,"Prekės formulė",ItemFormulaeInclVAT);
+    CheckBox(h,v+=16,0,"Reikalauti Prekės grupės",DemandItemGroup);
   end;
   EndWindow;
 end;
