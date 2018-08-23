@@ -1,0 +1,61 @@
+remote procedure BLT_UpdatePIPriceVc_PasteVECode(var record BLT_UpdatePIPriceVc);
+remote procedure BLT_RunUpdatePIPrices(record BLT_UpdatePIPriceVc);
+
+function boolean BLT_UpdatePIPriceDClassVECodeEFAfter(integer wn, integer changed)
+begin
+  record BLT_UpdatePIPriceVc BLT_UpdatePIPricer;
+  boolean res;
+
+  if changed != 0 then begin
+    GetWindowRecord(wn,BLT_UpdatePIPricer);
+    BLT_UpdatePIPriceVc_PasteVECode(BLT_UpdatePIPricer);
+    PutWindowRecord(wn,BLT_UpdatePIPricer);
+  end;
+
+  BLT_UpdatePIPriceDClassVECodeEFAfter = res;
+  return;
+end;
+
+global
+function Boolean BLT_UpdatePIPriceDClassAfterEditField(Integer wn,string fieldname,Integer fn, Integer rownr,Integer changed)
+BEGIN
+  Boolean res;
+
+  switch (fieldname) begin
+    case "VECode": res = BLT_UpdatePIPriceDClassVECodeEFAfter(wn,changed);
+  end;
+
+  BLT_UpdatePIPriceDClassAfterEditField = res;
+  RETURN;
+END;
+
+global
+procedure BLT_UpdatePricessm()
+begin
+  record BLT_UpdatePIPriceVc BLT_UpdatePIPricer;
+  row BLT_UpdatePIPriceVc BLT_UpdatePIPricerw;
+  integer wn,i,rwc;
+
+  wn = CurWindow;
+  DeselectWindow(wn,true);
+  GetWindowRecord(wn,BLT_UpdatePIPricer);
+
+  // Check if all prices are specified
+  rwc = MatRowCnt(BLT_UpdatePIPricer);
+  for(i=0;i<rwc;i=i+1)begin
+    MatRowGet(BLT_UpdatePIPricer,i,BLT_UpdatePIPricerw);
+    if nonblank(BLT_UpdatePIPricerw.ArtCode) and blank(BLT_UpdatePIPricerw.NewPrice) then begin
+      MessageBox(1100027,"");
+      SelectWindow(wn);
+      WindowFieldGoto(wn,BLT_UpdatePIPricer,i,"NewPrice",true);
+      GoTo LBLT_UpdatePricessm;
+    end;
+  end;
+
+  // Update prices
+  BLT_RunUpdatePIPrices(BLT_UpdatePIPricer);
+  MessageBox(1100028,"");
+
+LBLT_UpdatePricessm:;
+  return;
+end;

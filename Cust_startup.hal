@@ -6,7 +6,17 @@ begin
   Real h,v,l,vs;
 
   SetLangMode(LangLithuanian,"LIT",2);
+	Setting("Atnaujinti Kainas",BLT_UpdatePIPriceLClass,modPO);// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 23 August 2018 13:25:14
+	
+	//Import("Planedent - SwedBank import Statement",SwedBankImportSTIClass,SwedBankImportSTIn,modSL);// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 23 August 2018 14:22:06
+  Import("Planedent - SEB Bank import Statement",SEBBankImportSTIClass,SEBBankImportSTIn,modSL);// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 23 August 2018 14:22:10
+  //Import("NAA - Luminor import Statement",LuminorImportSTIClass,LuminorImportSTIn,modSL);// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 23 August 2018 14:22:12
 
+	//Setting("Planedent - SwedBank import Statement",SwedbankImportLClass,modSL);// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 23 August 2018 14:22:17
+	Setting("Planedent - SEB Bank import Statement",SEBbankImportLClass,modSL);// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 23 August 2018 14:22:19
+	//Setting("Planedent - Luminor import Statement",LuminorImportLClass,modSL);// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 23 August 2018 14:22:22
+
+	
   /* Lithuania Instrastat Export */
   StrSetBegin(631);
   StrSetText(O,"Primary");
@@ -19,6 +29,42 @@ begin
   SString(1000002,"Gamintojo prekės kodas");
 	SString(1000003,"Prekės vnt.");
 	SString(1000004,"Gamintojas");
+	
+  SString(1100005,"To pos.");
+
+  SString(1100006,"Default Picking Position not specified");
+  SString(1100007,"Default Picking Position already taken");
+  SString(1100008,"Deliveries for this route on particular date are forbidden");
+  SString(1100009,"Galioja iki");
+
+  SString(1100010,"Total boxes");
+
+  SString(1100011,"Missing number series for sales orders!");
+  SString(1100012,"ILN code not specified, please check export setting");
+  SString(1100013,"Sender contact code not specified, please check export setting");
+  SString(1100014,"Receiver ILN code not specified, please check export setting");
+  SString(1100015,"Receiver contact code not specified, please check export setting");
+  SString(1100016,"Path to export folder not specified, please check export setting");
+  SString(1100017,"Sales order with this number was already imported!");
+  SString(1100018,"No customer code for ILN code ");
+  SString(1100019,"No address for ILN code ");
+  SString(1100020,"One or more items do not exist");
+
+  SString(1100021,"Import folder not specified, please check EDI settings");
+  SString(1100022,"Import had errors, please check import error register");
+  SString(1100023,"Kiekių palyginimas");
+  SString(1100024,"Patv. kiekis");
+  SString(1100025,"Mūsų kiekis");
+  SString(1100026,"Best before date doesn’t meet customers’ minimum requirements");
+  SString(1100027,"Nurodykite kainą");
+  SString(1100028,"Price update finished");
+  SString(1100029,"Date must be within period");
+
+  SString(1100030,"Akcija nuo");
+  SString(1100031,"Akcija iki");
+  SString(1100032,"Akc. kaina");
+  SString(1100033,"Minimal best berfore days must be greater or equal to zero");
+  SString(1100034,"Best before date doesn’t meet minimum requirements");
 
   return;
 end;

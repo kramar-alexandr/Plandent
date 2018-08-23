@@ -1,0 +1,31 @@
+
+global
+function LongInt BLT_UpdatePIPriceVcRecordCheck(Var Record BLT_UpdatePIPriceVc BLT_UpdatePIPricer, Record BLT_UpdatePIPriceVc BLT_UpdatePIPrice2r, LongInt stat, LongInt check)
+begin
+  LongInt res;
+
+  res = 0;
+  if BLT_UpdatePIPricer.SerNr == -1 then begin
+    if CountRecords("BLT_UpdatePIPriceVc") == 0 then begin
+      BLT_UpdatePIPricer.SerNr = 10001;
+    end else begin
+      BLT_UpdatePIPricer.SerNr = NextSerNr("BLT_UpdatePIPriceVc",CurrentDate,-1,false,"");
+    end;
+  end;
+
+EndBLT_UpdatePIPriceVcRecordCheck:;
+  BLT_UpdatePIPriceVcRecordCheck = res;
+  return;
+end;
+
+global
+function LongInt BLT_UpdatePIPriceVcRecordDuplicate(Var Record BLT_UpdatePIPriceVc BLT_UpdatePIPricer, Record BLT_UpdatePIPriceVc BLT_UpdatePIPrice2r, LongInt long3, LongInt long4)
+begin
+  LongInt res;
+
+  res = -1;
+  BLT_UpdatePIPricer.SerNr = -1;
+
+  BLT_UpdatePIPriceVcRecordDuplicate = res;
+  return;
+end;

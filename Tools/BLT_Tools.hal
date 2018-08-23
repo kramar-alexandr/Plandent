@@ -1,0 +1,75 @@
+external inner function string 255 GetCustomerPriceList(string);
+external inner function Boolean ReadFirstItem(string,var record INVc,Boolean,Boolean);
+external inner function Integer PUVc_PasteQuant(var record PUVc,Integer);
+external inner procedure POVc_PasteQuant(var record POVc,Integer);
+external inner function LongInt GetCurUserLastNr(string);
+external inner updating procedure AssignStockResFromPO(record POVc);
+external inner function Boolean GetFirstItem(var string,var record INVc);
+external inner function val ItemInStock(var record INVc,string);
+external inner procedure FindBatchBestBeforeDate(string,string,var Date);
+external inner procedure M4PadString(string,Integer,string,Boolean,var string);
+external updating function Integer EBS_PastePOInPU(record POVc,record PUVc,Integer,array string,array val,array string,array date,array integer);
+external updating function boolean EDI_ImportOneFile(string);
+external function Boolean Prod_PasteBatchSerItems2(var string,var Date,var Integer,var val,var record ProdVc,var longint);
+
+global
+procedure BLT_UpdatePIPriceVc_PasteVECode(var record BLT_UpdatePIPriceVc BLT_UpdatePIPricer)
+begin
+  row BLT_UpdatePIPriceVc BLT_UpdatePIPricerw;
+  record PIVc PIr;
+  record INVc INr;
+  record CUVc VEr;
+  integer i,rwc;
+  boolean wloop;
+
+  if nonblank(BLT_UpdatePIPricer.VECode) then begin
+    VEr.Code = BLT_UpdatePIPricer.VECode;
+    ReadFirstMain(VEr,1,true);
+    BLT_UpdatePIPricer.VEName = VEr.Name;
+
+    PIr.VECode = BLT_UpdatePIPricer.VECode;
+    wloop = true;
+    While LoopKey("Vendor",PIr,1,wloop) begin
+      if PIr.VECode != BLT_UpdatePIPricer.VECode then begin
+        wloop = false;
+      end else begin
+        INr.Code = PIr.ItemCode;
+        ReadFirstMain(INr,1,true);
+        BLT_UpdatePIPricerw.ArtCode = PIr.ItemCode;
+        BLT_UpdatePIPricerw.Spec = INr.Name;
+        BLT_UpdatePIPricerw.OldPrice = PIr.PurPrice;
+        MatRowPut(BLT_UpdatePIPricer,MatRowCnt(BLT_UpdatePIPricer),BLT_UpdatePIPricerw);
+      end;
+    end;
+  end;
+
+  return;
+end;
+
+global updating
+procedure BLT_RunUpdatePIPrices(record BLT_UpdatePIPriceVc BLT_UpdatePIPricer)
+begin
+  row BLT_UpdatePIPriceVc BLT_UpdatePIPricerw;
+  record PIVc PIr,oldPIr;
+  integer i,rwc;
+
+  rwc = MatRowCnt(BLT_UpdatePIPricer);
+  for(i=0;i<rwc;i=i+1)begin
+    MatRowGet(BLT_UpdatePIPricer,i,BLT_UpdatePIPricerw);
+    if nonblank(BLT_UpdatePIPricerw.ArtCode) then begin
+      PIr.VECode = BLT_UpdatePIPricer.VECode;
+      PIr.ItemCode = BLT_UpdatePIPricerw.ArtCode;
+      if ReadFirstKey("Vendor",PIr,2,true) then begin
+        if PIr.PurPrice != BLT_UpdatePIPricerw.NewPrice then begin
+          RecordCopy(oldPIr,PIr);
+          PIr.PurPrice = BLT_UpdatePIPricerw.NewPrice;
+          if RecordUpdate(oldPIr,PIr,true) != 0 then begin
+            LogText(0,"BLT_RunUpdatePIPrices ERROR :: Could not update PIVc record " & PIr.VECode & " " & PIr.ItemCode);
+          end;
+        end;
+      end;
+    end;
+  end;
+
+  return;
+end;
