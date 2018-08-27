@@ -10,6 +10,8 @@ begin
 	
 	//Import("Planedent - SwedBank import Statement",SwedBankImportSTIClass,SwedBankImportSTIn,modSL);// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 23 August 2018 14:22:06
   Import("Planedent - SEB Bank import Statement",SEBBankImportSTIClass,SEBBankImportSTIn,modSL);// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 23 August 2018 14:22:10
+  Setting("Planedent - Banking Statement Import settings",BankImportSetTClass,modSL);// Edit ************************** BPI Ukraine - KramarAlexandr - Wednesday, 13 June 2018 10:16:15
+
   //Import("NAA - Luminor import Statement",LuminorImportSTIClass,LuminorImportSTIn,modSL);// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 23 August 2018 14:22:12
 
 	//Setting("Planedent - SwedBank import Statement",SwedbankImportLClass,modSL);// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 23 August 2018 14:22:17

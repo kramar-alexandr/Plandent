@@ -7,7 +7,12 @@ remote inner procedure IPVc_PasteBankCurncy(var record IPVc,Integer);
 external function string 255 BPI_ParseInvStr(string);
 external procedure FindCustomerByIBAN(string,string,var string,var boolean,string);
 external procedure BankFillIProws(var record IPVc,var integer,string,var string,var val,string,boolean,string);
-
+external procedure BankFillOProws(var record OPVc,var integer,string,var string,var val,string,boolean,string);
+external inner procedure ExtractObjWithSeparator(string,string,Boolean,var Integer,var string);
+external inner function Boolean PasteInvIn2OPr(var record OPVc,Integer,Date,Integer,val,var string,Boolean,var Boolean);
+external inner procedure OPVc_PasteBankCurncy(var record OPVc,Integer);
+external inner procedure OPVc_PasteRecVal(var record OPVc,Integer);
+external inner procedure OPVc_PasteVECode(var record OPVc,Integer);
 
 global updating procedure SwedBankImportSTIn()
 begin
@@ -436,7 +441,14 @@ begin
 	val remsum;
 	record ARVc ARr;
 	val chk;
-		
+	record OPVc OPr;
+	row OPVc OPrw,oldOPrw;
+	record BankImportSetBlock BISb;
+	record SEBbankImportVc oldSBIr;
+	string 255 tstr,tstr0;
+	
+	blockload(BISb);
+	
 	remsum = SBIr.AmtCcy;
 	//SBIr.IPNr = 1;
 	if(SBIr.IPNr<0)then begin
@@ -453,6 +465,84 @@ begin
 			BankFillIProws(IPr,k,SBIr.RecName,SBIr.CurncyCode,remsum,cucode,cufnd,instr);
 			if(recordstore(IPr,true))begin
 				SBIr.IPNr = IPr.SerNr;
+			end;
+		end;
+	end;
+	
+	if(SBIr.CdtDbtInd=="DBIT" and BISb.ImpPaymOrd==1 and blank(SBIr.PayType))then begin
+			
+		recordnew(OPr);
+		OPr.BankName = "SEBBANK: " & SBIr.Ustrd;
+		
+		OPr.TransDate = SBIr.BookgDt;	 
+		OPr.PayDate = SBIr.BookgDt;	 
+		OPr.SerNr = NextSerNr("OPVc",OPr.TransDate,-1,false,"");		
+		
+		CUr.Code = "";
+		FindCustomerByIBAN(SBIr.IBAN,SBIr.OrgId,cucode,cufnd,SBIr.RecName);
+		instr = BPI_ParseInvStr(SBIr.Ustrd);
+		
+		BankFillOProws(OPr,k,SBIr.RecName,SBIr.CurncyCode,remsum,cucode,cufnd,instr);
+			
+		if(recordstore(OPr,true))begin
+			SBIr.OPNr = OPr.SerNr;
+		end;
+	end else begin
+		if(SBIr.CdtDbtInd=="DBIT" and BISb.ImpPaymOrd==1 and BISb.ImpCharges==1 and nonblank(SBIr.PayType))then begin
+			pos = 0;
+			tstr = "";
+			tstr0 = "";
+			ExtractObjWithSeparator("-",SBIr.NtryRef,true,pos,tstr0);
+			ExtractObjWithSeparator("-",SBIr.NtryRef,true,pos,tstr);
+			if(stringtoint(tstr)>1)then begin
+			
+				logtext(0,"Charges " & SBIr.NtryRef);
+				oldSBIr.NtryRef = tstr0 & "-1";
+				oldSBIr.OwnID = SBIr.OwnID;
+				oldSBIr.BankID = SBIr.BankID;
+				if(readfirstmain(oldSBIr,3,true))then begin
+					OPr.SerNr = oldSBIr.OPNr;
+					if(readfirstmain(OPr,1,true))then begin
+						if(OPr.DoneFlag==0)then begin
+							
+							k = matrowcnt(OPr);
+							if(k>0)then begin
+								matrowget(OPr,0,oldOPrw);
+							end;
+							clearrow(OPr,OPrw,7);
+							OPrw.VISerNr = oldOPrw.VISerNr;
+							OPrw.Comment = SBIr.RecName;
+							OPrw.RecCurncy = SBIr.CurncyCode;
+							OPrw.BankCurncy = SBIr.CurncyCode;
+							matrowput(OPr,k,OPrw);
+							OPVc_PasteBankCurncy(OPr,k);
+							matrowget(OPr,k,OPrw);
+							OPrw.BankVal = remsum;
+							OPrw.RecVal = remsum;							
+							matrowput(OPr,k,OPrw);
+							OPVc_PasteRecVal(OPr,k);
+							
+							k=k+1;
+							if(recordstore(OPr,true))begin
+								SBIr.OPNr = OPr.SerNr;
+							end;
+						end;
+					end;
+				end;
+			end else begin
+				OPr.BankName = "SEBBANK: " & SBIr.Ustrd;
+		
+				OPr.TransDate = SBIr.BookgDt;	 
+				OPr.PayDate = SBIr.BookgDt;	 
+				OPr.SerNr = NextSerNr("OPVc",OPr.TransDate,-1,false,"");		
+		
+				CUr.Code = "";
+				FindCustomerByIBAN(SBIr.IBAN,SBIr.OrgId,cucode,cufnd,SBIr.RecName);
+				instr = BPI_ParseInvStr(SBIr.Ustrd);
+				BankFillOProws(OPr,k,SBIr.RecName,SBIr.CurncyCode,remsum,cucode,cufnd,instr);
+				if(recordstore(OPr,true))begin
+					SBIr.OPNr = OPr.SerNr;
+				end;
 			end;
 		end;
 	end;

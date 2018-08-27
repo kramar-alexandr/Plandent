@@ -69,6 +69,7 @@ begin
 		RecordField(OrgId,M4Code,50,0);
 		RecordField(PrvtId,M4Code,50,0);
 		RecordField(PayType,M4Str,50,0);
+		RecordField(OPNr,M4Long,0,0);
 		
 		MainKeyBegin(NtryRef,0);
   	KeySegment(NtryRef);
@@ -104,6 +105,7 @@ begin
 		RecordField(OrgId,M4Code,50,0);
 		RecordField(PrvtId,M4Code,50,0);
 		RecordField(PayType,M4Str,50,0);
+		RecordField(OPNr,M4Long,0,0);
 		
 		MainKeyBegin(NtryRef,0);
   	KeySegment(NtryRef);
@@ -139,6 +141,7 @@ begin
 		RecordField(OrgId,M4Code,50,0);
 		RecordField(PrvtId,M4Code,50,0);
 		RecordField(PayType,M4Str,50,0);
+		RecordField(OPNr,M4Long,0,0);
 		
 		MainKeyBegin(NtryRef,0);
   	KeySegment(NtryRef);
@@ -157,6 +160,12 @@ begin
   	KeySegment(BankID);
   	KeySegment(OwnID);
 	EndRecord;
+	
+	BlockBegin(BankImportSetBlock,-,"");// Edit ************************** BPI Ukraine - KramarAlexandr - Wednesday, 13 June 2018 10:12:18
+		RecordField(ImpPaym,M4Int,0,0);
+		RecordField(ImpPaymOrd,M4Int,0,0);
+		RecordField(ImpCharges,M4Int,0,0);
+	EndBlock;
 	
   return;
 end;

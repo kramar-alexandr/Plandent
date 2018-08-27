@@ -224,3 +224,21 @@ begin
   EndWindow;
   
 end;  
+
+window BankImportSetTClass:1// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 23 August 2018 15:14:58
+  wtag("language","LIT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  real h,v,vm,vs;
+  v = 6; vs = 20; h = 90;
+
+  WindowBegin("Planedent - Banking Statement Import settings",BankImportSetTClass,CGSbl,-);
+  SetWRect(20,80,400,480);
+  SetBlid(BankImportSetBlock);
+  Sizeable(-1,-1,0,0);
+  	h = 50;
+  	CheckBox(h,v+=20,0,"Import payments",ImpPaym);
+  	CheckBox(h,v+=20,0,"Import payment orders",ImpPaymOrd);
+  	CheckBox(h,v+=20,0,"Import charges",ImpCharges);
+  EndWindow;
+
+end;
