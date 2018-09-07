@@ -130,6 +130,22 @@ begin
 		end;
 	end;
 	
+	if(cufnd==false)then begin
+		if(nonblank(OrgId))then begin
+			CUr.Code = OrgId;
+			TrHs = true;
+			while(loopkey("Code",CUr,1,TrHs))begin
+				if(CUr.Code==OrgId)then begin
+					TrHs = false;
+					cufnd = true;
+					cucode = CUr.Code;
+				end else begin
+					TrHs = false;
+				end;
+			end;
+		end;
+	end;
+	
 return;
 end;
 
@@ -141,10 +157,11 @@ begin
 	boolean installmentf;
 	val chk;
 	record ARVc ARr;
-	boolean TrHs;
+	boolean TrHs,testf;
 	record CUVc CUr;
 	LongInt error;
 	record BaseCurBlock BCb;
+	vector boolean invused;
 	
 	blockload(BCb);
 	
@@ -166,9 +183,11 @@ begin
 						matrowput(IPr,k,IPrw);
 						PasteInvIn2IPr(IPr,k,IPr.TransDate,chk,false,installmentf);
 						matrowget(IPr,k,IPrw);
+						invused[IPrw.InvoiceNr] = true;
 						IPrw.CustName = RecName;
 						IPrw.RecCurncy = CurncyCode;
 						IPrw.BankCurncy = CurncyCode;
+						IPrw.PayDate = IPr.TransDate;
 						matrowput(IPr,k,IPrw);
 						IPVc_PasteBankCurncy(IPr,k);
 						matrowget(IPr,k,IPrw);
@@ -177,6 +196,7 @@ begin
 							IPrw.RecVal = remsum;
 							IPrw.RecCurncy = CurncyCode;
 							IPrw.BankCurncy = CurncyCode;
+							IPrw.PayDate = IPr.TransDate;
 							matrowput(IPr,k,IPrw);
 							IPVc_PasteRecVal(IPr,k);
 							matrowget(IPr,k,IPrw);
@@ -187,6 +207,7 @@ begin
 							IPrw.RecVal = IPrw.RecVal;
 							IPrw.RecCurncy = CurncyCode;
 							IPrw.BankCurncy = CurncyCode;
+							IPrw.PayDate = IPr.TransDate;
 							matrowput(IPr,k,IPrw);
 							IPVc_PasteRecVal(IPr,k);
 							matrowget(IPr,k,IPrw);
@@ -201,9 +222,11 @@ begin
 						matrowput(IPr,k,IPrw);
 						PasteInvIn2IPr(IPr,k,IPr.TransDate,chk,false,installmentf);
 						matrowget(IPr,k,IPrw);
+						invused[IPrw.InvoiceNr] = true;
 						IPrw.CustName = RecName;
 						IPrw.RecCurncy = CurncyCode;
 						IPrw.BankCurncy = CurncyCode;
+						IPrw.PayDate = IPr.TransDate;
 						matrowput(IPr,k,IPrw);
 						IPVc_PasteBankCurncy(IPr,k);
 						matrowget(IPr,k,IPrw);
@@ -212,6 +235,7 @@ begin
 							IPrw.RecVal = remsum;
 							IPrw.RecCurncy = CurncyCode;
 							IPrw.BankCurncy = CurncyCode;
+							IPrw.PayDate = IPr.TransDate;
 							matrowput(IPr,k,IPrw);
 							IPVc_PasteRecVal(IPr,k);
 							matrowget(IPr,k,IPrw);
@@ -222,6 +246,7 @@ begin
 							IPrw.RecVal = IPrw.RecVal;
 							IPrw.RecCurncy = CurncyCode;
 							IPrw.BankCurncy = CurncyCode;
+							IPrw.PayDate = IPr.TransDate;
 							matrowput(IPr,k,IPrw);
 							IPVc_PasteRecVal(IPr,k);
 							matrowget(IPr,k,IPrw);
@@ -234,6 +259,59 @@ begin
 			end;
 		end;
 		resetloop(ARr);
+		
+		if(remsum>0)then begin
+			ARr.CustCode = cucode;
+			TrHs = true;
+			while(loopkey("CustCode",ARr,1,TrHs))begin
+				testf = true;
+				if(ARr.CustCode!=cucode)then begin TrHs = false; testf = false; end;
+				if(invused[ARr.InvoiceNr]==true)then begin testf = false; end;
+							
+				if(testf)then begin
+					if(remsum>0)then begin
+						clearrow(IPr,IPrw,1);
+						IPrw.InvoiceNr = ARr.InvoiceNr;
+						matrowput(IPr,k,IPrw);
+						PasteInvIn2IPr(IPr,k,IPr.TransDate,chk,false,installmentf);
+						matrowget(IPr,k,IPrw);
+						invused[IPrw.InvoiceNr] = true;
+						IPrw.CustName = RecName;
+						IPrw.RecCurncy = CurncyCode;
+						IPrw.BankCurncy = CurncyCode;
+						IPrw.PayDate = IPr.TransDate;
+						matrowput(IPr,k,IPrw);
+						IPVc_PasteBankCurncy(IPr,k);
+						matrowget(IPr,k,IPrw);
+						if(IPrw.BankVal>=remsum)then begin
+							IPrw.BankVal = remsum;
+							IPrw.RecVal = remsum;
+							IPrw.RecCurncy = CurncyCode;
+							IPrw.BankCurncy = CurncyCode;
+							IPrw.PayDate = IPr.TransDate;
+							matrowput(IPr,k,IPrw);
+							IPVc_PasteRecVal(IPr,k);
+							matrowget(IPr,k,IPrw);
+							remsum = 0;
+						end;
+						if(IPrw.RecVal<remsum)then begin
+							IPrw.BankVal = IPrw.RecVal;
+							IPrw.RecVal = IPrw.RecVal;
+							IPrw.RecCurncy = CurncyCode;
+							IPrw.BankCurncy = CurncyCode;
+							IPrw.PayDate = IPr.TransDate;
+							matrowput(IPr,k,IPrw);
+							IPVc_PasteRecVal(IPr,k);
+							matrowget(IPr,k,IPrw);
+							remsum = remsum - IPrw.RecVal;
+						end;
+						k=k+1;
+					end;
+				end;
+			end;
+			resetloop(ARr);
+		end;
+		
 	end else begin
 		TrHs = true;
 		ARr.CustCode = "";
@@ -249,6 +327,7 @@ begin
 						IPrw.CustName = RecName;
 						IPrw.RecCurncy = CurncyCode;
 						IPrw.BankCurncy = CurncyCode;
+						IPrw.PayDate = IPr.TransDate;
 						matrowput(IPr,k,IPrw);
 						IPVc_PasteBankCurncy(IPr,k);
 						matrowget(IPr,k,IPrw);
@@ -257,6 +336,7 @@ begin
 							IPrw.RecVal = remsum;
 							IPrw.RecCurncy = CurncyCode;
 							IPrw.BankCurncy = CurncyCode;
+							IPrw.PayDate = IPr.TransDate;
 							matrowput(IPr,k,IPrw);
 							IPVc_PasteRecVal(IPr,k);
 							matrowget(IPr,k,IPrw);
@@ -267,6 +347,7 @@ begin
 							IPrw.RecVal = IPrw.RecVal;
 							IPrw.RecCurncy = CurncyCode;
 							IPrw.BankCurncy = CurncyCode;
+							IPrw.PayDate = IPr.TransDate;
 							matrowput(IPr,k,IPrw);
 							IPVc_PasteRecVal(IPr,k);
 							matrowget(IPr,k,IPrw);
@@ -283,6 +364,7 @@ begin
 						IPrw.CustName = RecName;
 						IPrw.RecCurncy = CurncyCode;
 						IPrw.BankCurncy = CurncyCode;
+						IPrw.PayDate = IPr.TransDate;
 						matrowput(IPr,k,IPrw);
 						IPVc_PasteBankCurncy(IPr,k);
 						matrowget(IPr,k,IPrw);
@@ -291,6 +373,7 @@ begin
 							IPrw.RecVal = remsum;
 							IPrw.RecCurncy = CurncyCode;
 							IPrw.BankCurncy = CurncyCode;
+							IPrw.PayDate = IPr.TransDate;
 							matrowput(IPr,k,IPrw);
 							IPVc_PasteRecVal(IPr,k);
 							matrowget(IPr,k,IPrw);
@@ -301,6 +384,7 @@ begin
 							IPrw.RecVal = IPrw.RecVal;
 							IPrw.RecCurncy = CurncyCode;
 							IPrw.BankCurncy = CurncyCode;
+							IPrw.PayDate = IPr.TransDate;
 							matrowput(IPr,k,IPrw);
 							IPVc_PasteRecVal(IPr,k);
 							matrowget(IPr,k,IPrw);
@@ -326,23 +410,31 @@ begin
 			matrowget(IPr,k,IPrw);
 			IPrw.RecCurncy = CurncyCode;
 			IPrw.BankCurncy = CurncyCode;
+IPrw.PayDate = IPr.TransDate;
 			matrowput(IPr,k,IPrw);
 			IPVc_PasteBankCurncy(IPr,k);
 			matrowget(IPr,k,IPrw);
 			IPrw.RecVal = remsum;
 			IPrw.BankVal = remsum;
 			IPrw.CustName = RecName;
+			IPrw.RecCurncy = CurncyCode;
+			IPrw.BankCurncy = CurncyCode;
+IPrw.PayDate = IPr.TransDate;
 			matrowput(IPr,k,IPrw);
 			IPVc_PasteRecVal(IPr,k);
 		end else begin
 			clearrow(IPr,IPrw,1);
 			IPrw.BankCurncy = CurncyCode;
+IPrw.PayDate = IPr.TransDate;
 			matrowput(IPr,k,IPrw);
 			IPVc_PasteBankCurncy(IPr,k);
 			matrowget(IPr,k,IPrw);
 			IPrw.BankVal = remsum;
 			IPrw.RecVal = remsum;
 			IPrw.CustName = RecName;
+			IPrw.RecCurncy = CurncyCode;
+			IPrw.BankCurncy = CurncyCode;
+IPrw.PayDate = IPr.TransDate;
 			matrowput(IPr,k,IPrw);
 			IPVc_PasteRecVal(IPr,k);
 		end;
@@ -379,12 +471,15 @@ begin
 						matrowget(OPr,k,OPrw);
 						OPrw.Comment = RecName;
 						OPrw.RecCurncy = CurncyCode;
+						OPrw.BankCurncy = CurncyCode;
 						matrowput(OPr,k,OPrw);
 						OPVc_PasteBankCurncy(OPr,k);
 						matrowget(OPr,k,OPrw);
 						if(OPrw.BankVal>=remsum)then begin
 							OPrw.BankVal = remsum;
 							OPrw.RecVal = remsum;
+							OPrw.BankCurncy = CurncyCode;
+							OPrw.RecCurncy = CurncyCode;
 							matrowput(OPr,k,OPrw);
 							OPVc_PasteRecVal(OPr,k);
 							matrowget(OPr,k,OPrw);
@@ -393,6 +488,8 @@ begin
 						if(OPrw.RecVal<remsum)then begin
 							OPrw.BankVal = OPrw.RecVal;
 							OPrw.RecVal = OPrw.RecVal;
+							OPrw.BankCurncy = CurncyCode;
+							OPrw.RecCurncy = CurncyCode;
 							matrowput(OPr,k,OPrw);
 							OPVc_PasteRecVal(OPr,k);
 							matrowget(OPr,k,OPrw);
@@ -408,12 +505,15 @@ begin
 						matrowget(OPr,k,OPrw);
 						OPrw.Comment = RecName;
 						OPrw.RecCurncy = CurncyCode;
+						OPrw.BankCurncy = CurncyCode;
 						matrowput(OPr,k,OPrw);
 						OPVc_PasteBankCurncy(OPr,k);
 						matrowget(OPr,k,OPrw);
 						if(OPrw.BankVal>=remsum)then begin
 							OPrw.BankVal = remsum;
 							OPrw.RecVal = remsum;
+							OPrw.BankCurncy = CurncyCode;
+							OPrw.RecCurncy = CurncyCode;
 							matrowput(OPr,k,OPrw);
 							OPVc_PasteRecVal(OPr,k);
 							matrowget(OPr,k,OPrw);
@@ -422,6 +522,8 @@ begin
 						if(OPrw.RecVal<remsum)then begin
 							OPrw.BankVal = OPrw.RecVal;
 							OPrw.RecVal = OPrw.RecVal;
+							OPrw.BankCurncy = CurncyCode;
+							OPrw.RecCurncy = CurncyCode;
 							matrowput(OPr,k,OPrw);
 							OPVc_PasteRecVal(OPr,k);
 							matrowget(OPr,k,OPrw);
@@ -447,12 +549,15 @@ begin
 						matrowget(OPr,k,OPrw);
 						OPrw.Comment = RecName;
 						OPrw.RecCurncy = CurncyCode;
+						OPrw.BankCurncy = CurncyCode;
 						matrowput(OPr,k,OPrw);
 						OPVc_PasteBankCurncy(OPr,k);
 						matrowget(OPr,k,OPrw);
 						if(OPrw.BankVal>=remsum)then begin
 							OPrw.BankVal = remsum;
 							OPrw.RecVal = remsum;
+							OPrw.BankCurncy = CurncyCode;
+							OPrw.RecCurncy = CurncyCode;
 							matrowput(OPr,k,OPrw);
 							OPVc_PasteRecVal(OPr,k);
 							matrowget(OPr,k,OPrw);
@@ -461,6 +566,8 @@ begin
 						if(OPrw.RecVal<remsum)then begin
 							OPrw.BankVal = OPrw.RecVal;
 							OPrw.RecVal = OPrw.RecVal;
+							OPrw.BankCurncy = CurncyCode;
+							OPrw.RecCurncy = CurncyCode;
 							matrowput(OPr,k,OPrw);
 							OPVc_PasteRecVal(OPr,k);
 							matrowget(OPr,k,OPrw);
@@ -482,6 +589,8 @@ begin
 						if(OPrw.BankVal>=remsum)then begin
 							OPrw.BankVal = remsum;
 							OPrw.RecVal = remsum;
+							OPrw.BankCurncy = CurncyCode;
+							OPrw.RecCurncy = CurncyCode;
 							matrowput(OPr,k,OPrw);
 							OPVc_PasteRecVal(OPr,k);
 							matrowget(OPr,k,OPrw);
@@ -490,6 +599,8 @@ begin
 						if(OPrw.RecVal<remsum)then begin
 							OPrw.BankVal = OPrw.RecVal;
 							OPrw.RecVal = OPrw.RecVal;
+							OPrw.BankCurncy = CurncyCode;
+							OPrw.RecCurncy = CurncyCode;
 							matrowput(OPr,k,OPrw);
 							OPVc_PasteRecVal(OPr,k);
 							matrowget(OPr,k,OPrw);
@@ -520,6 +631,8 @@ begin
 			OPrw.RecVal = remsum;
 			OPrw.BankVal = remsum;
 			OPrw.Comment = RecName;
+			OPrw.BankCurncy = CurncyCode;
+			OPrw.RecCurncy = CurncyCode;
 			matrowput(OPr,k,OPrw);
 			OPVc_PasteRecVal(OPr,k);
 		end else begin
@@ -531,6 +644,8 @@ begin
 			OPrw.BankVal = remsum;
 			OPrw.RecVal = remsum;
 			OPrw.Comment = RecName;
+			OPrw.BankCurncy = CurncyCode;
+			OPrw.RecCurncy = CurncyCode;
 			matrowput(OPr,k,OPrw);
 			OPVc_PasteRecVal(OPr,k);
 		end;
