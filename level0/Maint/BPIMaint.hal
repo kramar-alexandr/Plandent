@@ -1,0 +1,16 @@
+global updating procedure DelPINMn(record RcVc RepSpec)
+begin
+	record PIVc PIr;
+	record INVc INr;
+	
+	while(loopmain(PIr,1,true))begin
+		INr.Code = PIr.ItemCode;
+		if(readfirstmain(INr,1,true)==false)then begin
+			logtext(0,"Delete Purch. item " & PIr.ItemCode);
+			recorddelete(PIr);
+			stepback(PIr);
+		end;
+	end;
+
+return;
+end;

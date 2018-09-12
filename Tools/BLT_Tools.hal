@@ -35,7 +35,7 @@ begin
       end else begin
         INr.Code = PIr.ItemCode;
         ReadFirstMain(INr,1,true);
-        BLT_UpdatePIPricerw.ArtCode = PIr.ItemCode;
+        BLT_UpdatePIPricerw.ArtCode = PIr.VEItemCode;// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 10 September 2018 09:48:58
         BLT_UpdatePIPricerw.Spec = INr.Name;
         BLT_UpdatePIPricerw.OldPrice = PIr.PurPrice;
         MatRowPut(BLT_UpdatePIPricer,MatRowCnt(BLT_UpdatePIPricer),BLT_UpdatePIPricerw);
@@ -58,13 +58,13 @@ begin
     MatRowGet(BLT_UpdatePIPricer,i,BLT_UpdatePIPricerw);
     if nonblank(BLT_UpdatePIPricerw.ArtCode) then begin
       PIr.VECode = BLT_UpdatePIPricer.VECode;
-      PIr.ItemCode = BLT_UpdatePIPricerw.ArtCode;
-      if ReadFirstKey("Vendor",PIr,2,true) then begin
+      PIr.VEItemCode = BLT_UpdatePIPricerw.ArtCode;
+      if ReadFirstKey("VEItemCode",PIr,2,true) then begin
         if PIr.PurPrice != BLT_UpdatePIPricerw.NewPrice then begin
           RecordCopy(oldPIr,PIr);
           PIr.PurPrice = BLT_UpdatePIPricerw.NewPrice;
           if RecordUpdate(oldPIr,PIr,true) != 0 then begin
-            LogText(0,"BLT_RunUpdatePIPrices ERROR :: Could not update PIVc record " & PIr.VECode & " " & PIr.ItemCode);
+            LogText(0,"BLT_RunUpdatePIPrices ERROR :: Could not update PIVc record " & PIr.VECode & " " & PIr.VEItemCode);
           end;
         end;
       end;
