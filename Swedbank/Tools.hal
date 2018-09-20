@@ -9,6 +9,24 @@ external inner procedure OPVc_PasteBankCurncy(var record OPVc,Integer);
 external inner procedure OPVc_PasteRecVal(var record OPVc,Integer);
 external inner procedure OPVc_PasteVECode(var record OPVc,Integer);
 
+global function string 255 ConvertNameToSet(string name)
+begin
+	integer i;
+	string 255 res;
+	
+	For(i=0;i<len(name);i=i+1) begin
+	  if(mid(name,i,1)==" ")then begin
+	  	res = res & ",";
+	  end else begin
+	  	res = res & uppercase(mid(name,i,1));
+	  end;
+	end; 
+	
+	ConvertNameToSet = res;
+	
+return;
+end;
+
 global function string 255 BPI_ParseInvStrDelMinus(string Ustrd)
 begin
 	integer i;
@@ -79,6 +97,7 @@ begin
 	boolean TrHs;
 	record LetVc Letr;
 	record CUVc CUr;
+	string 255 inname,outname;
 	
 	TrHs = true;
 	if(nonblank(IBAN) or nonblank(OrgId))then begin
@@ -103,15 +122,18 @@ begin
 				AddToText(CUr.InvAddr2 & ";",Letr);
 				AddToText(CUr.InvAddr3 & ";",Letr);
 				AddToText(CUr.InvAddr4 & ";",Letr);
-			
-				if(StringInText(IBAN,Letr))then begin
-					TrHs = false;
-					cufnd = true;
-					cucode = CUr.Code;
+				
+				if(nonblank(IBAN))then begin
+					if(StringInText(IBAN,Letr))then begin
+						TrHs = false;
+						cufnd = true;
+						cucode = CUr.Code;
+					end;
 				end;
 			
 			end;
 		end;
+		resetloop(CUr);
 	end;
 	
 	if(cufnd==false)then begin
@@ -127,6 +149,7 @@ begin
 					TrHs = false;
 				end;
 			end;
+			resetloop(CUr);
 		end;
 	end;
 	
@@ -143,9 +166,28 @@ begin
 					TrHs = false;
 				end;
 			end;
+			resetloop(CUr);
 		end;
 	end;
 	
+	if(cufnd==false)then begin
+		if(nonblank(cuname))then begin
+			inname = ConvertNameToSet(cuname);
+			CUr.Name = "";
+			TrHs = true;
+			if(nonblank(inname))then begin
+				while(loopkey("Name",CUr,1,TrHs))begin
+					outname = ConvertNameToSet(CUr.Name);
+					if(setinset(inname,outname))then begin
+						TrHs = false;
+						cufnd = true;
+						cucode = CUr.Code;
+					end;
+				end;
+			end;
+			resetloop(CUr);
+		end;
+	end;
 return;
 end;
 
