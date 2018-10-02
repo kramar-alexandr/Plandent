@@ -289,7 +289,6 @@ begin
       t = t2p;
       
       if (PIp.NormPOQty!=0) and (defic==false) then begin
-      	logtext(0,INp.Code & " " & res & " " & checkpif & " " & defic);
         if (PIp.NormPOQty>t2p) then begin
           t2p = PIp.NormPOQty;
         end;
@@ -300,7 +299,6 @@ begin
           t2p = t*PIp.NormPOQty;
         end;
       end;
-      logtext(0,INp.Code & " checkminpoqty " & checkminpoqty);
       if (checkminpoqty) then begin
         if (PIp.MinPOQty!=0) then begin
           if (PIp.MinPOQty>t2p) then begin
