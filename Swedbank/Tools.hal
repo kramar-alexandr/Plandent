@@ -1,3 +1,4 @@
+//<halrule>server-only</halrule>
 external inner function Boolean IPVc_PasteCustCode(var record IPVc,Integer,var LongInt);
 external inner procedure ExtractObj(string,var Integer,var string);
 external inner function Boolean PasteInvIn2IPr(var record IPVc,Integer,Date,var val,Boolean,var Boolean);
@@ -24,6 +25,31 @@ begin
 	
 	ConvertNameToSet = res;
 	
+return;
+end;
+
+global function string 255 BPI_ParseInvStrDelLetters(string Ustrd)
+begin
+	integer i;
+	string 255 instr,c;
+	
+	For(i=0;i<len(Ustrd);i=i+1) begin
+		c = mid(Ustrd,i,1);
+		if(c>="0" and c<="9")then begin
+			instr = instr & c;
+		end;
+	end;
+	if(len(instr)>1)then begin
+		For(i=0;i<len(instr)-1;i=i+1) begin
+			c = mid(instr,i,2);
+			if(c==",,")then begin
+				instr = left(instr,i) & right(instr,len(instr)-i-1);
+				i=i-1;
+			end;
+		end;
+	end;
+	
+	BPI_ParseInvStrDelLetters = instr;
 return;
 end;
 
@@ -86,7 +112,7 @@ begin
 		instr = left(instr,len(instr)-1);
 	end;
 	
-	instr = instr & "," & BPI_ParseInvStrDelMinus(instr);
+	instr = instr & "," & BPI_ParseInvStrDelMinus(instr) & "," & BPI_ParseInvStrDelLetters(Ustrd);
 		
 	BPI_ParseInvStr = instr;
 return;
@@ -193,7 +219,7 @@ end;
 
 
 
-global procedure BankFillIProws(var record IPVc IPr,var integer k,string RecName,var string CurncyCode,var val remsum,string cucode,boolean cufnd,string instr)
+global procedure BankFillIProws(var record IPVc IPr,var integer k,string RecName,var string CurncyCode,var val remsum,string cucode,boolean cufnd,string instr,string origcomm)
 begin
 	row IPVc IPrw;
 	boolean installmentf;
@@ -204,8 +230,15 @@ begin
 	LongInt error;
 	record BaseCurBlock BCb;
 	vector boolean invused;
+	record BankImportSetBlock BISb;
+	record LetVc Letr;
+	string 50 keyname;
 	
+	blockload(BISb);
 	blockload(BCb);
+	
+	RecordClear(Letr);
+	AddToText(origcomm,Letr);
 	
 	if(blank(CurncyCode))then begin
 		CurncyCode = BCb.BaseCur1;
@@ -219,7 +252,7 @@ begin
 									
 			if(TrHs)then begin
 				if(remsum>0)then begin
-					if(setinset(ARr.InvoiceNr,instr))then begin
+					if(setinset(ARr.InvoiceNr,instr) or StringInText(ARr.InvoiceNr,Letr))then begin
 						clearrow(IPr,IPrw,1);
 						IPrw.InvoiceNr = ARr.InvoiceNr;
 						matrowput(IPr,k,IPrw);
@@ -258,7 +291,7 @@ begin
 						k=k+1;
 	
 					end;
-					if(setinset(ARr.OfficialSerNr,instr) and nonblank(ARr.OfficialSerNr))then begin
+					if((setinset(ARr.OfficialSerNr,instr) or StringInText(ARr.OfficialSerNr,Letr)) and nonblank(ARr.OfficialSerNr))then begin
 						clearrow(IPr,IPrw,1);
 						IPrw.InvoiceNr = ARr.InvoiceNr;
 						matrowput(IPr,k,IPrw);
@@ -305,7 +338,15 @@ begin
 		if(remsum>0)then begin
 			ARr.CustCode = cucode;
 			TrHs = true;
-			while(loopkey("CustCode",ARr,1,TrHs))begin
+			if(BISb.InvFIFO==0)then begin
+				ARr.CustCode = cucode;
+				keyname = "CustInv";
+			end;
+			if(BISb.InvFIFO==1)then begin
+				ARr.CustCode = cucode;
+				keyname = "CustDue";
+			end;
+			while(loopkey(keyname,ARr,1,TrHs))begin
 				testf = true;
 				if(ARr.CustCode!=cucode)then begin TrHs = false; testf = false; end;
 				if(invused[ARr.InvoiceNr]==true)then begin testf = false; end;
@@ -360,7 +401,7 @@ begin
 		while(loopkey("CustCode",ARr,1,TrHs))begin												
 			if(TrHs)then begin
 				if(remsum>0)then begin
-					if(setinset(ARr.InvoiceNr,instr))then begin
+					if(setinset(ARr.InvoiceNr,instr) or StringInText(ARr.InvoiceNr,Letr))then begin
 						clearrow(IPr,IPrw,1);
 						IPrw.InvoiceNr = ARr.InvoiceNr;
 						matrowput(IPr,k,IPrw);
@@ -397,7 +438,7 @@ begin
 						end;
 						k=k+1;	
 					end;
-					if(setinset(ARr.OfficialSerNr,instr) and nonblank(ARr.OfficialSerNr))then begin
+					if((setinset(ARr.OfficialSerNr,instr) or StringInText(ARr.OfficialSerNr,Letr)) and nonblank(ARr.OfficialSerNr))then begin
 						clearrow(IPr,IPrw,1);
 						IPrw.InvoiceNr = ARr.InvoiceNr;
 						matrowput(IPr,k,IPrw);

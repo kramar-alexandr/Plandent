@@ -1,3 +1,4 @@
+//<halrule>server-only</halrule>
 remote inner function Boolean IPVc_PasteCustCode(var record IPVc,Integer,var LongInt);
 external inner procedure ExtractObj(string,var Integer,var string);
 remote inner function Boolean PasteInvIn2IPr(var record IPVc,Integer,Date,var val,Boolean,var Boolean);
@@ -6,7 +7,7 @@ remote inner procedure IPVc_PasteRecVal(var record IPVc,Integer);
 remote inner procedure IPVc_PasteBankCurncy(var record IPVc,Integer);
 external function string 255 BPI_ParseInvStr(string);
 external procedure FindCustomerByIBAN(string,string,var string,var boolean,string);
-external procedure BankFillIProws(var record IPVc,var integer,string,var string,var val,string,boolean,string);
+external procedure BankFillIProws(var record IPVc,var integer,string,var string,var val,string,boolean,string,string);
 external procedure BankFillOProws(var record OPVc,var integer,string,var string,var val,string,boolean,string);
 external inner procedure ExtractObjWithSeparator(string,string,Boolean,var Integer,var string);
 external inner function Boolean PasteInvIn2OPr(var record OPVc,Integer,Date,Integer,val,var string,Boolean,var Boolean);
@@ -393,7 +394,7 @@ begin
 			
 			instr = BPI_ParseInvStr(SWIr.Ustrd);
 							
-			BankFillIProws(IPr,k,SWIr.RecName,SWIr.CurncyCode,remsum,cucode,cufnd,instr);
+			BankFillIProws(IPr,k,SWIr.RecName,SWIr.CurncyCode,remsum,cucode,cufnd,instr,SWIr.Ustrd);
 			if(recordstore(IPr,true))begin
 				SWIr.IPNr = IPr.SerNr;
 			end;
@@ -462,7 +463,7 @@ begin
 			
 			instr = BPI_ParseInvStr(SBIr.Ustrd);
 							
-			BankFillIProws(IPr,k,SBIr.RecName,SBIr.CurncyCode,remsum,cucode,cufnd,instr);
+			BankFillIProws(IPr,k,SBIr.RecName,SBIr.CurncyCode,remsum,cucode,cufnd,instr,SBIr.Ustrd);
 			if(recordstore(IPr,true))begin
 				SBIr.IPNr = IPr.SerNr;
 			end;
@@ -601,7 +602,7 @@ begin
 			CUr.Code = "";
 			FindCustomerByIBAN(LRIr.IBAN,LRIr.OrgId,cucode,cufnd,LRIr.RecName);
 			instr = BPI_ParseInvStr(LRIr.Ustrd);
-			BankFillIProws(IPr,k,LRIr.RecName,LRIr.CurncyCode,remsum,cucode,cufnd,instr);
+			BankFillIProws(IPr,k,LRIr.RecName,LRIr.CurncyCode,remsum,cucode,cufnd,instr,LRIr.Ustrd);
 			if(recordstore(IPr,true))begin
 				LRIr.IPNr = IPr.SerNr;
 			end;

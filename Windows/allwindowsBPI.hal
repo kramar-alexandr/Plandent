@@ -239,6 +239,10 @@ begin
   	CheckBox(h,v+=20,0,"Import payments",ImpPaym);
   	CheckBox(h,v+=20,0,"Import payment orders",ImpPaymOrd);
   	CheckBox(h,v+=20,0,"Import charges",ImpCharges);
+  	v=v+20;
+		ButtonFrame(h,v=v+20,210,2,"Import is done by connecting");
+		RadioButton(h,v,0,0,"The oldest invoices (FIFO method)",InvFIFO);
+		RadioButton(h,v+=16,1,0,"The oldest due dates",InvFIFO);
   EndWindow;
 
 end;
