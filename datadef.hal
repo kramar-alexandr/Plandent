@@ -32,6 +32,7 @@ SOURCEFILE("halcust\\Tools",3);
 SOURCEFILE("halcust\\WActions",3);
 SOURCEFILE("halcust\\Windows",3);
 SOURCEFILE("halcust\\Swedbank",3);
+SOURCEFILE("halcust\\Datadefs",3);
 
 begin
 	
