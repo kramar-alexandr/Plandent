@@ -27,6 +27,7 @@ begin
   RecordField(Withholdings,M4Int,0,0);
   RecordField(UseSupersessionIN,M4Int,0,0);
   RecordField(MultiBuyDiscount,M4Int,0,0); // not used
+  RecordField(ShowItemPicture,M4Int,0,0);
   RecordField(ClassType,M4Code,10,0); //EBS
   EndBlock;
 

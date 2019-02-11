@@ -310,6 +310,7 @@ begin
   end;
 //  FindFutureQuantity(RepSpec,INp.Code,t);//??
   //t1p = t1p + t;
+  
   FindPOQantity2 = res;
   return;
 end;
@@ -437,7 +438,7 @@ begin
         end;
       end;    
       if (testf) then begin
-        PrintData(2,RepSpec,itemcode,INr,true);
+        PrintData(90,RepSpec,itemcode,INr,true);
       end;
     end;
   end;
@@ -696,7 +697,7 @@ begin
   if (RepSpec.flags[6]!=0) and (varf) then begin
     ShowVarietiesDeficiency(RepSpec,INr);
   end else begin
-    PrintData(2,RepSpec,INr.Code,INr,varf);
+    PrintData(90,RepSpec,INr.Code,INr,varf);
   end;
   return;
 end;
@@ -879,7 +880,7 @@ begin
     Header(rw,tstr,1);
   end;
   EndHeader;
-  SetRepCol(2,60);
+  SetRepCol(2,90);
   if (IsStandardProduct==false) then begin
     SetRepCol(7,150);
     SetRepCol(3,185);

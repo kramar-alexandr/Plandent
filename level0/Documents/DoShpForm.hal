@@ -732,6 +732,7 @@ BEGIN
 
   PrintInvoiceToBankData(CUr.BankAccount,Bankr,ORr.InvoiceToCode);
   PrintBankData(ORr.BankCode);
+  OUTFORMFIELD("F_DELADDRESSCODE",SHr.DelAddrCode);
   OUTFORMFIELD("F_PLANSENTDATE",SHr.PlanSendDate);
   OUTFORMFIELD("F_PLANSENTTIME",SHr.PlanSendTime);
   OUTFORMFIELD("F_PLANARRIVALDATE",SHr.PlanArrDate);

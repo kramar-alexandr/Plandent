@@ -11,6 +11,8 @@ external inner function Boolean HasExtTax();
 external inner function Boolean HasWithholdingTax();
 external inner function Boolean IsEnterprise();
 external inner function Boolean StandardHansa();
+external inner function Boolean HASMODIN();
+
 
 SetLangMode(LangLithuanian,"LIT",2);
 
@@ -43,6 +45,7 @@ begin
   CheckBox(h,v+=16,0,"Rodyti galiojimo laiką",BestBefore);
   CheckBox(h,v+=16,0,"Rodyti siuntos būklę",BatchStatus);
   CheckBox(h,v+=16,0,"Rodyti prekės būklę",ShowItemStatus);
+    CheckBox(h,v+=16,0,"Rodyti prekes paveikslėlį",ShowItemPicture); 
   end;
   if (HasExtTax) then begin
   CheckBox(h,v+=16,0,"Skaičiuoti percepcinius mokesčius",Perceptions);
@@ -62,7 +65,7 @@ begin
       if (HasWithholdingTax) then begin
   CheckBox(h,v+=16,0,"Naudoti supersesijos prekes",UseSupersessionIN);
       end else begin
-        CheckBox(h,v+=2*16,0,"Naudoti supersesijos prekes",UseSupersessionIN);
+        CheckBox(h,v+=16,0,"Naudoti supersesijos prekes",UseSupersessionIN);
       end;
     end;
   //CheckBox(h,v+=16,0,"Naudoti kelių pirk. nuolaidą",MultiBuyDiscount);
@@ -117,7 +120,7 @@ begin
   if (HasDepartments) then begin
   EditFieldTL(h,v+=vs, 150,"Skyrius",   M4UStr,Normal,11,f4,false,DepSClass);
   end;
-  EditFieldTL(h,v+=vs, 150,"Customer",   M4UStr,Normal,20,f5,false,CUSClass); //!!TRANSLATE
+  EditFieldTL(h,v+=vs, 150,"Klientas",   M4UStr,Normal,20,f5,false,CUSClass); 
   if (HasPriceLists) then begin
   EditFieldTL(h,v+=vs, 70,"Kainoraštis",   M4UStr,Normal,5,f2,false,PLDefSClass);
   end;
@@ -148,7 +151,9 @@ begin
   end;
   CheckBox(h,vm=v, 70,"Kainos su PVM",flags[8]);
   CheckBox(h,v+=16, 70,"Kainos be PVM",flags[9]);
+  if (HasModIN) then begin
   CheckBox(h,v+=16, 70,"Tik prekės su likučiais",flags[4]);
+  end;
   CheckBox(h,v+=16, 70,"Tik šio kainoraščio prekės",flags[5]);
   if (HasMultiCurrency) then begin
   	CheckBox(h,v+=16, 70,"Didinti su kursu (valiuta iš kainoraščio)",flags[6]);

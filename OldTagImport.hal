@@ -1,0 +1,37 @@
+global
+updating procedure ReadImportTagItemSettingBlock(string thetag)
+begin
+  record ItemSettingBlock ItemSettingr;
+  
+  if (NextImportLine(false)) then begin
+    ItemSettingr.DefIGroup = ImportField;
+    ItemSettingr.UniqueBarCode = StringToInt(ImportField);
+    ItemSettingr.BestBefore = StringToInt(ImportField);
+    ItemSettingr.ShowItemStatus = StringToInt(ImportField);
+    ItemSettingr.BarCodeLength = StringToInt(ImportField);
+    ItemSettingr.DefItemType = StringToInt(ImportField);
+    ItemSettingr.NoBasePriceChange = StringToInt(ImportField);
+    ItemSettingr.UpdateCost = StringToInt(ImportField);
+    ItemSettingr.ItemFormulaeInclVAT = StringToInt(ImportField);
+    ItemSettingr.SumupItemQty = StringToInt(ImportField);
+    ItemSettingr.BatchStatus = StringToInt(ImportField);
+    ItemSettingr.EnCalcDimQty = StringToInt(ImportField);
+    ItemSettingr.UpdCurPrWithDate = StringToInt(ImportField);
+    ItemSettingr.YourBarCodeDef = ImportField;
+    ItemSettingr.BarCodeStartFrom = ImportField;
+    ItemSettingr.DemandItemGroup = StringToInt(ImportField);
+    ItemSettingr.WarrantyLength = StringToVal(ImportField,M4UVal);
+    ItemSettingr.SerNrf = StringToInt(ImportField);
+    ItemSettingr.Unittext = ImportField;
+    ItemSettingr.SRUpdateCost = StringToInt(ImportField);
+    ItemSettingr.Perceptions = StringToInt(ImportField);
+    ItemSettingr.Withholdings = StringToInt(ImportField);
+    ItemSettingr.UseSupersessionIN = StringToInt(ImportField);
+    ItemSettingr.MultiBuyDiscount = StringToInt(ImportField);
+    ItemSettingr.ClassType = ImportField;
+    
+    BlockStore(ItemSettingr);
+  end;
+  
+  return;
+end;

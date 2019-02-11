@@ -1,5 +1,5 @@
 remote procedure BLT_UpdatePIPriceVc_PasteVECode(var record BLT_UpdatePIPriceVc);
-remote procedure BLT_RunUpdatePIPrices(record BLT_UpdatePIPriceVc);
+remote updating procedure BLT_RunUpdatePIPrices(record BLT_UpdatePIPriceVc);
 
 function boolean BLT_UpdatePIPriceDClassVECodeEFAfter(integer wn, integer changed)
 begin
@@ -30,7 +30,7 @@ BEGIN
 END;
 
 global
-procedure BLT_UpdatePricessm()
+updating procedure BLT_UpdatePricessm()
 begin
   record BLT_UpdatePIPriceVc BLT_UpdatePIPricer;
   row BLT_UpdatePIPriceVc BLT_UpdatePIPricerw;

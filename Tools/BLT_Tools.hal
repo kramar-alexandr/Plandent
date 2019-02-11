@@ -8,9 +8,9 @@ external inner function Boolean GetFirstItem(var string,var record INVc);
 external inner function val ItemInStock(var record INVc,string);
 external inner procedure FindBatchBestBeforeDate(string,string,var Date);
 external inner procedure M4PadString(string,Integer,string,Boolean,var string);
-external updating function Integer EBS_PastePOInPU(record POVc,record PUVc,Integer,array string,array val,array string,array date,array integer);
-external updating function boolean EDI_ImportOneFile(string);
-external function Boolean Prod_PasteBatchSerItems2(var string,var Date,var Integer,var val,var record ProdVc,var longint);
+//external updating function Integer EBS_PastePOInPU(record POVc,record PUVc,Integer,array string,array val,array string,array date,array integer);
+//external updating function boolean EDI_ImportOneFile(string);
+//external function Boolean Prod_PasteBatchSerItems2(var string,var Date,var Integer,var val,var record ProdVc,var longint);
 
 global
 procedure BLT_UpdatePIPriceVc_PasteVECode(var record BLT_UpdatePIPriceVc BLT_UpdatePIPricer)
