@@ -328,7 +328,7 @@ LSortGRRows:;
 end;
 
 global
-procedure DoPurchaseForm(record RcVc RepSpec,record PUVc PUr)
+procedure DoPurchaseForm(record RcVc RepSpec,record PUVc origPUr)
 BEGIN
   record FormDefVc FDr;
   row FormDefVc FDrw;
@@ -337,10 +337,12 @@ BEGIN
   Integer i,rwcnt;
   string 20 langcode;
   Boolean langf;
-  
+  record PUVc PUr;// Edit ************************** BPI Ukraine - KramarAlexandr - 03, 27 02 2019 y. at 11:20:37 AM
   Boolean printf;
   Integer intdocnr;
   string 30 formcode;
+  
+  recordcopy(PUr,origPUr);// Edit ************************** BPI Ukraine - KramarAlexandr - 03, 27 02 2019 y. at 11:21:16 AM
     
   BlockLoad(SysFormatRec);  
   FDr.repname = RepSpec.repname;
