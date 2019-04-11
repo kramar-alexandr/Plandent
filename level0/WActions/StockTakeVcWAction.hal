@@ -477,7 +477,7 @@ begin
     case "InStock": res = false;
     // case "TransDate": res = false;// OFF Edit ************************** BPI Ukraine - KramarAlexandr - 01, 08 04 2019 y. at 4:15:59 PM
 //    case "Location": res = false;
-    case "Location": res = false;
+    //case "Location": res = false;// Edit ************************** BPI Ukraine - KramarAlexandr - 04, 11 04 2019 y. at 10:11:10 AM
   end;
   StockTakeDClassActiveEditField = res;
   return;
