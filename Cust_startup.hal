@@ -17,7 +17,14 @@ begin
 	//Setting("Planedent - SwedBank import Statement",SwedbankImportLClass,modSL);// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 23 August 2018 14:22:17
 	Setting("Planedent - SEB Bank import Statement",SEBbankImportLClass,modSL);// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 23 August 2018 14:22:19
 	//Setting("Planedent - Luminor import Statement",LuminorImportLClass,modSL);// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 23 August 2018 14:22:22
-
+	
+	
+	//Copyed from Internal Stock Module ti Stock
+	RegisterWS("Atvykst. prekės","Atvykst. prekės","Nauja atvykst. prekė",OffHireVc,modIN);
+  RegisterWS("Išvykst. prekės","Išvykst. prekės","Nauja išvykst. prekė",DispatchVc,modIN); 
+	Report("Vidinio sandėlio likučiai",IntINRClass,IntInvValRn,0,modIN);
+  Report("Grąžinamų prekių žurnalas",GoodsINRClass,GoodsinRn,0,modIN);
+  Report("Išduodamų prekių žurnalas",GoodsOutRclass,GoodsOutRn,0,modIN);
 	
   /* Lithuania Instrastat Export */
   StrSetBegin(631);
