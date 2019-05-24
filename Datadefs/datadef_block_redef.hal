@@ -30,6 +30,15 @@ begin
   RecordField(ShowItemPicture,M4Int,0,0);
   RecordField(ClassType,M4Code,10,0); //EBS
   EndBlock;
+  
+  
+  BlockBegin(IVMailBlock,-,"");// Edit ************************** BPI Ukraine - KramarAlexandr - 05, 24 05 2019 y. at 12:02:51 PM
+  RecordField(Header,M4Str,60,0);
+  RecordField(FirstTxt,M4Code,5,LTxtVc);
+  RecordField(LastTxt,M4Code,5,LTxtVc);
+  RecordField(EmailSender,M4Str,40,0);
+  RecordField(AutoSendIV,M4Int,0,0);// Edit ************************** BPI Ukraine - KramarAlexandr - 05, 24 05 2019 y. at 12:03:14 PM
+  EndBlock;
 
   return;
 end;

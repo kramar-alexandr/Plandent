@@ -279,3 +279,21 @@ begin
   SearchField("Ieškoti");
   EndWindow;
 end;
+
+
+window IVMailTClass:1
+  wtag("language","LIT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  real v;
+  WindowBegin("Faktūros laiško nustatymai",IVMailTClass,CGSbl,IVMailType);
+  SetBlid(IVMailBlock);
+  SetWRect(64,80,512,148);
+  v = 6;
+  EditField(100,v, -20,"Antraštė",Normal,Header,false,0);
+  EditField(100,v+=20, 70,"Pradžios tekstas",Normal,FirstTxt,false,LTxtSClass);
+  EditField(100,v+=20, 70,"Pabaigos tekstas",Normal,LastTxt,false,LTxtSClass);
+  EditField(100,v+=20,150,"E-pašto siuntėjas",Normal,EmailSender,false,ConfSClass); 
+  CheckBox(30,v+=16,0,"Send e-mail automatically when OKing Sales invoice",AutoSendIV);// Edit ************************** BPI Ukraine - KramarAlexandr - 05, 24 05 2019 y. at 12:04:02 PM
+
+  EndWindow;
+end;

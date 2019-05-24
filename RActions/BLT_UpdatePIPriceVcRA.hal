@@ -1,3 +1,4 @@
+external inner updating function Integer CreateMailFromIVD(record IVVc,var record MailVc,var string,Boolean,string);
 
 global
 function LongInt BLT_UpdatePIPriceVcRecordCheck(Var Record BLT_UpdatePIPriceVc BLT_UpdatePIPricer, Record BLT_UpdatePIPriceVc BLT_UpdatePIPrice2r, LongInt stat, LongInt check)
@@ -29,3 +30,77 @@ begin
   BLT_UpdatePIPriceVcRecordDuplicate = res;
   return;
 end;
+
+
+global
+updating function LongInt IVVcRecordUpdateAfter(var record IVVc IVr,record IVVc IV2r,LongInt long3,LongInt long4)
+BEGIN
+	longint res;
+	record IVMailBlock IVMb;
+	record MailVc Mailr,oldMailr;
+	Integer err;
+	string 200 tstr,docname;
+	blockload(IVMb);
+	
+	res = inner.IVVcRecordUpdateAfter(IVr,IV2r,long3,long4);
+	
+	if(IVr.OKFlag==1 and IV2r.OKFlag==0)then begin
+		if(IVMb.AutoSendIV==1)then begin
+			docname = "InvForm";
+			switch (IVr.InvType) begin
+				case kInvoiceTypeCash: docname = "CashInvForm";
+				case kInvoiceTypeCashInvoiceReceiptPRT: docname = "CashInvRecPRTForm";
+				case kInvoiceTypeCredit: docname = "CredInvForm";
+				case kInvoiceTypeInterest: docname = "IIInvForm";
+				case kInvoiceTypeCreditSpecialSales: docname = "CredInvForm";
+			end;
+			
+			err = CreateMailFromIVD(IVr,Mailr,tstr,false,docname);
+			if(err==0)then begin
+				recordcopy(oldMailr,Mailr);
+				Mailr.SendFlag = 1;
+				recordupdate(oldMailr,Mailr,true);
+			end;
+		end;
+	end;
+	
+	IVVcRecordUpdateAfter = res; 
+return;
+end;
+
+global
+updating function LongInt IVVcRecordSaveAfter(var record IVVc IVr,record IVVc IV2r,LongInt long3,LongInt long4)
+BEGIN
+	longint res;
+	record IVMailBlock IVMb;
+	record MailVc Mailr,oldMailr;
+	Integer err;
+	string 200 tstr,docname;
+	blockload(IVMb);
+	
+	res = inner.IVVcRecordSaveAfter(IVr,IV2r,long3,long4);
+	if(IVr.OKFlag==1)then begin
+		if(IVMb.AutoSendIV==1)then begin
+			docname = "InvForm";
+			switch (IVr.InvType) begin
+				case kInvoiceTypeCash: docname = "CashInvForm";
+				case kInvoiceTypeCashInvoiceReceiptPRT: docname = "CashInvRecPRTForm";
+				case kInvoiceTypeCredit: docname = "CredInvForm";
+				case kInvoiceTypeInterest: docname = "IIInvForm";
+				case kInvoiceTypeCreditSpecialSales: docname = "CredInvForm";
+			end;
+		
+			err = CreateMailFromIVD(IVr,Mailr,tstr,false,docname);
+			if(err==0)then begin
+				recordcopy(oldMailr,Mailr);
+				Mailr.SendFlag = 1;
+				recordupdate(oldMailr,Mailr,true);
+			end;
+		end;
+	end;
+	
+	IVVcRecordSaveAfter = res; 
+return;
+end;
+
+
