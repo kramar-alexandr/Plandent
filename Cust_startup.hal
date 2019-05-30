@@ -20,11 +20,11 @@ begin
 	
 	
 	//Copyed from Internal Stock Module ti Stock
-	RegisterWS("Atvykst. prekės","Atvykst. prekės","Nauja atvykst. prekė",OffHireVc,modIN);
-  RegisterWS("Išvykst. prekės","Išvykst. prekės","Nauja išvykst. prekė",DispatchVc,modIN); 
-	Report("Vidinio sandėlio likučiai",IntINRClass,IntInvValRn,0,modIN);
-  Report("Grąžinamų prekių žurnalas",GoodsINRClass,GoodsinRn,0,modIN);
-  Report("Išduodamų prekių žurnalas",GoodsOutRclass,GoodsOutRn,0,modIN);
+	RegisterWS("Atvykst. prekės","Atvykst. prekės","Nauja atvykst. prekė",OffHireVc,modSVO);
+  RegisterWS("Išvykst. prekės","Išvykst. prekės","Nauja išvykst. prekė",DispatchVc,modSVO); 
+	Report("Vidinio sandėlio likučiai",IntINRClass,IntInvValRn,0,modSVO);
+  Report("Grąžinamų prekių žurnalas",GoodsINRClass,GoodsinRn,0,modSVO);
+  Report("Išduodamų prekių žurnalas",GoodsOutRclass,GoodsOutRn,0,modSVO);
 	
   /* Lithuania Instrastat Export */
   StrSetBegin(631);
