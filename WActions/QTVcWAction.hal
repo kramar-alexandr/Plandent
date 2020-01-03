@@ -1,0 +1,90 @@
+remote inner function Boolean QTVc_PasteArtCode(var record QTVc,Integer,var string,var string);
+remote function Boolean PL_QTVc_PasteArtCode(var record QTVc,Integer,var string);
+external inner function Boolean QTDClassSwitchRow(Integer,Integer);
+remote updating procedure PLD_CreatePricesRemote(record RcVc);
+
+global
+updating procedure PLD_CreatePrices()
+begin
+  Integer wn;
+  record RcVc RepSpec;
+  
+  wn = CurWindow;
+  DeselectWindow(wn,true);
+  GetWindowRecord(wn,RepSpec);
+  if (blank(RepSpec.d1) or RepSpec.d1<CurrentDate) then begin
+    MessageBox(22118,"");
+    WindowFieldGoto(wn,RepSpec,-1,"d1",true);
+  end else begin
+    PLD_CreatePricesRemote(RepSpec);
+    CloseWindow(wn);
+  end;
+
+  return;
+end;  
+
+
+global
+procedure PLD_CreatePricesFromQTDsm()
+begin
+  Integer wn,nwn;
+  record RcVc RepSpec;
+  record QTVc QTr;
+  
+  wn = CurWindow;
+  if (WindowState(wn)==Rs_Normal) then begin
+    GetWindowRecord(wn,QTr);
+    RepSpec.long1 = QTr.SerNr;
+    nwn = OpenWindow("PLD_CreatePricesWClass",0,0,"","",RepSpec);
+  end;
+
+  return;
+end;
+
+function Boolean QTDClassArtCodeEFAfter(Integer wn,Integer rownr,Boolean changedf)
+begin
+  Boolean res;
+  record QTVc QTr;
+  row QTVc QTrw;
+  record INVc INr;
+  string 255 inwarning,warning;
+  Integer sernrf;
+
+  res = true;
+  if (changedf) then begin
+    GetWindowRecord(wn,QTr);
+    MatRowGet(QTr,rownr,QTrw);
+    if (QTVc_PasteArtCode(QTr,rownr,inwarning,warning)) then begin
+    end;
+    if (nonblank(inwarning)) then begin
+      MessageBox(0,inwarning);
+    end;
+    if (nonblank(warning)) then begin
+      MessageBox(0,warning);
+    end;
+    warning = "";
+    PL_QTVc_PasteArtCode(QTr,rownr,warning);
+    if (nonblank(warning)) then begin
+      MessageBox(0,warning);      
+    end;
+    PutWindowRecord(wn,QTr);
+    if (QTDClassSwitchRow(wn,rownr)) then begin end;  
+  end;
+  QTDClassArtCodeEFAfter = res;
+  return;
+end;
+
+global
+function Boolean QTDClassAfterEditField(Integer wn,string fieldname,Integer fn, Integer rownr,Integer changed)
+begin
+  Boolean res;
+  
+  switch (fieldname) begin
+    case "ArtCode": res = QTDClassArtCodeEFAfter(wn,rownr,changed!=0);
+    otherwise
+      res = inner.QTDClassAfterEditField(wn,fieldname,fn,rownr,changed);
+  end;
+
+  QTDClassAfterEditField = res;
+  return;
+end;

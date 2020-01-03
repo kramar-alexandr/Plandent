@@ -11,6 +11,16 @@ external inner procedure M4PadString(string,Integer,string,Boolean,var string);
 //external updating function Integer EBS_PastePOInPU(record POVc,record PUVc,Integer,array string,array val,array string,array date,array integer);
 //external updating function boolean EDI_ImportOneFile(string);
 //external function Boolean Prod_PasteBatchSerItems2(var string,var Date,var Integer,var val,var record ProdVc,var longint);
+external inner function Boolean ORDchrsum(var record ORVc,Integer);
+external inner procedure ORDchsum(var record ORVc,Integer);
+external inner function Boolean IVDchrsum(var record IVVc,Integer);
+external inner procedure IVDchsum(var record IVVc,Integer);
+external inner procedure QTDchsum(record QTVc,Integer);
+external inner function Boolean QTDchrsum(var record QTVc,Integer,Integer);
+external inner function Boolean GetItemPriceDiscount3(string,val,var record INVc,string,val,val,val,val,val,string,string,string,string,
+                                                var val,var string,var val,var string,var val,var string,Integer,var Boolean,Date,Time,
+                                                string,Boolean,var Boolean,string,var string,var val,string,string,var string);
+
 
 global
 procedure BLT_UpdatePIPriceVc_PasteVECode(var record BLT_UpdatePIPriceVc BLT_UpdatePIPricer)
@@ -38,6 +48,7 @@ begin
         BLT_UpdatePIPricerw.ArtCode = PIr.VEItemCode;// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 10 September 2018 09:48:58
         BLT_UpdatePIPricerw.Spec = INr.Name;
         BLT_UpdatePIPricerw.OldPrice = PIr.PurPrice;
+        BLT_UpdatePIPricerw.PlannedDelDays = PIr.PlannedDelDays;
         MatRowPut(BLT_UpdatePIPricer,MatRowCnt(BLT_UpdatePIPricer),BLT_UpdatePIPricerw);
       end;
     end;
@@ -60,14 +71,281 @@ begin
       PIr.VECode = BLT_UpdatePIPricer.VECode;
       PIr.VEItemCode = BLT_UpdatePIPricerw.ArtCode;
       if ReadFirstKey("VEItemCode",PIr,2,true) then begin
-        if PIr.PurPrice != BLT_UpdatePIPricerw.NewPrice then begin
+        if (PIr.PurPrice != BLT_UpdatePIPricerw.NewPrice or PIr.PlannedDelDays != BLT_UpdatePIPricerw.PlannedDelDays) then begin
           RecordCopy(oldPIr,PIr);
           PIr.PurPrice = BLT_UpdatePIPricerw.NewPrice;
+          PIr.PlannedDelDays = BLT_UpdatePIPricerw.PlannedDelDays;
           if RecordUpdate(oldPIr,PIr,true) != 0 then begin
             LogText(0,"BLT_RunUpdatePIPrices ERROR :: Could not update PIVc record " & PIr.VECode & " " & PIr.VEItemCode);
           end;
         end;
       end;
+    end;
+  end;
+
+  return;
+end;
+
+global 
+updating procedure PLD_UpdateINMinBtnRemote(var record ORVc ORr,var string fn,var Integer rownr,var Longint err)
+begin
+  string 255 tstr,incode;
+  integer i,rwcnt;
+  row ORVc ORrw;
+  record INVc INr,oldINr;
+  record RcVc RepSpec;
+  Boolean testf;
+  
+  rwcnt = MatRowCnt(ORr);
+
+  rownr = -1;
+  rwcnt = MatRowCnt(ORr);
+  for (i=0;i<rwcnt;i=i+1) begin
+    MatRowGet(ORr,i,ORrw);
+    testf = true;
+    fn = "";
+    if (blank(ORrw.ArtCode)) then begin
+      testf = false;
+      fn = "ArtCode";
+    end;
+    INr.Code = ORrw.ArtCode;
+    if (ReadFirstMain(INr,1,true)==false) then begin
+      testf = false;
+      fn = "ArtCode";
+      err = 1100101;
+    end;
+    if (!testf) then begin
+      rownr = i;
+      if (err<0) then begin
+        err = 1058;
+      end;
+      goto LPLD_UpdateINMinBtnRemote;
+      
+    end;
+  end;  
+
+  for (i=0;i<rwcnt;i=i+1) begin
+    MatRowGet(ORr,i,ORrw);
+    tstr = Trim(ORrw.ArtCode);
+    incode = left(tstr,20);
+    INr.Code = incode;
+    if (ReadFirstMain(INr,1,true)) then begin
+      RecordCopy(oldINr,INr);
+      INr.MinLevel = ORrw.Quant;
+      RecordUpdate(oldINr,INr,true);
+    end;
+  end;
+  for (i=rwcnt-1;i>=0;i=i-1) begin
+    MatRowDelete(ORr,i);
+  end;
+
+LPLD_UpdateINMinBtnRemote:;
+  return;
+end;
+
+global
+updating procedure PLD_CreatePricesRemote(record RcVc RepSpec)
+begin
+  record QTVc QTr;
+  row QTVc QTrw;
+  Integer i,rwcnt;
+  record PLVc PLr;
+  
+  QTr.SerNr = RepSpec.long1;
+  if (ReadFirstMain(QTr,1,true)) then begin
+    rwcnt = MatRowCnt(QTr);
+    for (i=0;i<rwcnt;i=i+1) begin
+      MatRowGet(QTr,i,QTrw);
+      if (nonblank(QTrw.ArtCode)) then begin
+        RecordNew(PLr);
+        PLr.UUID = MakeUUID;
+        PLr.ArtCode = QTrw.ArtCode;
+        PLr.Comment = QTrw.Spec;
+        PLr.CustCode = QTr.CustCode;
+        PLr.ExVatPrice = QTrw.Price;
+        PLr.DateUntil = RepSpec.d1;
+        RecordStore(PLr,true);
+      end;
+    end;
+  end;
+
+  return;
+end;
+
+function Boolean FindItemPrice(string item,string custcode,Date td,var val price)
+begin
+  record PLVc PLr;
+  Boolean res;
+
+  PLr.PLCode = "";
+  PLr.ArtCode = item;
+  PLr.CustCode = custcode;
+  if (ReadFirstMain(PLr,3,true)) then begin
+    if (PLr.DateUntil>=td) then begin
+      res = true;
+      price = PLr.ExVatPrice;
+    end;
+  end;
+
+  FindItemPrice = res;
+  return;
+end;
+
+
+global
+function Boolean PL_GetItemPriceDiscount3(string item,val qtp,var record INVc INr,string crncycode,
+         val frrate,val torate1,val torate2,val basrate1,val basrate2,
+         string langcode,string custcat,string pricelist,string rebcode,
+         var val price,var string descstr,var val discount,
+         var string vatcode,var val basepricep,var string salesacc,Integer aexport,var Boolean calcpricef,
+         Date tdp,Time tt,string custcode,Boolean forcepropervar,var Boolean nomoreremotecalls,string paydeal,var string tax2code,var val tax2prc,
+         string region,string location,var string taxtempletecode,Date td,var Boolean pricef)
+begin
+  Boolean TrHs;
+  val tprice;
+  record PL_LinkedItemVc LIr;
+  row PL_LinkedItemVc LIrw;
+  Integer i,rwcnt;
+  Boolean res;
+
+  pricef = false;
+  if (GetItemPriceDiscount3(item,qtp,INr,crncycode,
+         frrate,torate1,torate2,basrate1,basrate2,
+         langcode,custcat,pricelist,rebcode,
+         price,descstr,discount,
+         vatcode,basepricep,salesacc,aexport,calcpricef,
+         tdp,tt,custcode,forcepropervar,nomoreremotecalls,paydeal,tax2code,tax2prc,
+         region,location,taxtempletecode)) then begin
+
+    res = true;
+    //Check Linked Items
+    if (FindItemPrice(item,custcode,td,tprice)) then begin
+      pricef = true;
+      price = tprice;
+    end else begin
+      TrHs = true;
+      while (LoopKey("ArtCode:" & item,LIr,1,TrHs)) begin
+        rwcnt = MatRowCnt(LIr);
+        for (i=0;i<rwcnt;i=i+1) begin
+          MatRowGet(LIr,i,LIrw);
+          if (FindItemPrice(LIrw.ArtCode,custcode,td,tprice)) then begin
+            price = tprice;
+            pricef = true;
+            TrHs = false;
+          end;
+        end;
+      end;
+    end;
+    if (!pricef) then begin
+      price = INr.UPrice1;
+    end;
+  end;  
+  PL_GetItemPriceDiscount3 = res;
+  return;
+end;
+
+global
+procedure PL_ORVc_PasteArtCode(record ORVc ORr,Integer rownr,var string warning)
+begin
+  Boolean pricef;
+  row ORVc ORrw;
+  Boolean chsum;
+  record INVc INr;
+  val t,s,price,vreb,baseprice,temp,tax2prc,tax2reb;
+  string 255 curitemname,salesacc,vatcode,tstr,tax2code,location,taxtemplatecode;
+  Boolean calcprice;
+  Date orddate;
+  Boolean dummyf;
+  record TaxMatrixVc TMr;
+  Time blankt;
+
+
+  MatRowGet(ORr,rownr,ORrw);
+  if (PL_GetItemPriceDiscount3(ORrw.ArtCode,ORrw.Quant,INr,ORr.CurncyCode,
+                            ORr.FrRate,ORr.ToRateB1,ORr.ToRateB2,ORr.BaseRate1,ORr.BaseRate2,
+                            ORr.LangCode,ORr.CustCat,ORr.PriceList,ORr.RebCode,
+                            price,curitemname,vreb,vatcode,baseprice,salesacc,
+                            ORr.ExportFlag,calcprice,orddate,blankt,ORr.CustCode,true,dummyf,ORr.PayDeal,tax2code,tax2prc,ORr.Region,location,taxtemplatecode,ORr.OrdDate,pricef)) then begin
+    if (!pricef) then begin
+      warning = UsetStr(1100102);
+    end;
+    ORrw.Price = price;
+    MatRowPut(ORr,rownr,ORrw);
+    chsum = ORDchrsum(ORr,rownr);
+    if (chsum) then begin
+      ORDchsum(ORr,rownr);
+    end;
+  end;
+
+  return;
+end;
+
+global
+procedure PL_IVVc_PasteArtCode(record IVVc IVr,Integer rownr,var string warning)
+begin
+  Boolean pricef;
+  row IVVc IVrw;
+  Boolean chsum;
+  record INVc INr;
+  val t,s,price,vreb,baseprice,temp,tax2prc,tax2reb;
+  string 255 curitemname,salesacc,vatcode,tstr,tax2code,location,taxtemplatecode;
+  Boolean calcprice;
+  Date orddate;
+  Boolean dummyf;
+  record TaxMatrixVc TMr;
+  Time blankt;
+
+
+  MatRowGet(IVr,rownr,IVrw);
+  if (PL_GetItemPriceDiscount3(IVrw.ArtCode,IVrw.Quant,INr,IVr.CurncyCode,
+                            IVr.FrRate,IVr.ToRateB1,IVr.ToRateB2,IVr.BaseRate1,IVr.BaseRate2,
+                            IVr.LangCode,IVr.CustCat,IVr.PriceList,IVr.RebCode,
+                            price,curitemname,vreb,vatcode,baseprice,salesacc,
+                            IVr.ExportFlag,calcprice,orddate,blankt,IVr.CustCode,true,dummyf,IVr.PayDeal,tax2code,tax2prc,IVr.Region,location,taxtemplatecode,IVr.InvDate,pricef)) then begin
+    if (!pricef) then begin
+      warning = UsetStr(1100102);
+    end;
+    IVrw.Price = price;
+    MatRowPut(IVr,rownr,IVrw);
+    chsum = IVDchrsum(IVr,rownr);
+    if (chsum) then begin
+      IVDchsum(IVr,rownr);
+    end;
+  end;
+
+  return;
+end;
+
+global
+procedure PL_QTVc_PasteArtCode(record QTVc QTr,Integer rownr,var string warning)
+begin
+  Boolean pricef;
+  row QTVc QTrw;
+  Boolean chsum;
+  record INVc INr;
+  val t,s,price,vreb,baseprice,temp,tax2prc,tax2reb;
+  string 255 curitemname,salesacc,vatcode,tstr,tax2code,location,taxtemplatecode;
+  Boolean calcprice;
+  Date orddate;
+  Boolean dummyf;
+  record TaxMatrixVc TMr;
+  Time blankt;
+
+
+  MatRowGet(QTr,rownr,QTrw);
+  if (PL_GetItemPriceDiscount3(QTrw.ArtCode,QTrw.Quant,INr,QTr.CurncyCode,
+                            QTr.FrRate,QTr.ToRateB1,QTr.ToRateB2,QTr.BaseRate1,QTr.BaseRate2,
+                            QTr.LangCode,QTr.CustCat,QTr.PriceList,QTr.RebCode,
+                            price,curitemname,vreb,vatcode,baseprice,salesacc,
+                            QTr.ExportFlag,calcprice,orddate,blankt,QTr.CustCode,true,dummyf,QTr.PayDeal,tax2code,tax2prc,QTr.Region,location,taxtemplatecode,QTr.QTDate,pricef)) then begin
+    if (!pricef) then begin
+      warning = UsetStr(1100102);
+    end;
+    QTrw.Price = price;
+    MatRowPut(QTr,rownr,QTrw);
+    chsum = QTDchrsum(QTr,rownr,0);
+    if (chsum) then begin
+      QTDchsum(QTr,rownr);
     end;
   end;
 

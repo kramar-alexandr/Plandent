@@ -1,0 +1,34 @@
+
+function Boolean PL_LinkedItemDClassCustCodeEFAfter(Integer wn,Integer rownr,Boolean changedf)
+begin
+  Boolean res;
+  record PL_LinkedItemVc LIr;
+  row PL_LinkedItemVc LIrw;
+  record INVc INr;
+
+  res = true;
+  if (changedf) then begin
+    GetWindowRecord(wn,LIr);
+    MatRowGet(LIr,rownr,LIrw);
+    INr.Code = LIrw.ArtCode;
+    if (ReadFirstMain(INr,1,true)) then begin
+      LIrw.Spec = INr.Name;
+      MatRowPut(LIr,rownr,LIrw);
+      PutWindowRecord(wn,LIr);
+    end;
+  end;
+  PL_LinkedItemDClassCustCodeEFAfter = res;
+  return;
+end;
+
+global
+function Boolean PL_LinkedItemDClassAfterEditField(Integer wn,string fieldname,Integer fn, Integer rownr,Integer changed)
+begin
+  Boolean res;
+
+  switch (fieldname) begin
+    case "ArtCode": res = PL_LinkedItemDClassCustCodeEFAfter(wn,rownr,changed!=0);
+  end;
+  PL_LinkedItemDClassAfterEditField = res;
+  return;
+end;

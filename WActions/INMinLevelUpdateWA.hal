@@ -1,0 +1,32 @@
+
+remote updating procedure PLD_UpdateINMinBtnRemote(var record ORVc,var string,var Integer,var Longint);
+
+global 
+updating procedure PLD_UpdateINMinBtn()
+begin
+  Integer wn,nwn;
+  record ORVc ORr;
+  Integer i,rwcnt,rownr;
+  Boolean testf;
+  Longint err;
+  record RcVc RepSpec;
+  string 255 fn;
+
+  wn = CurWindow;
+  DeselectWindow(wn,true);
+  GetWindowRecord(wn,ORr);
+  nwn = OpenWindow("WaitClass",0,0,"","",RepSpec);
+  if (MatRowCnt(ORr)>0) then begin
+    PLD_UpdateINMinBtnRemote(ORr,fn,rownr,err);
+    if (rownr>-1) then begin
+      MessageBox(err,"");
+      WindowFieldGoto(wn,ORr,rownr,fn,true)
+    end else begin
+      MessageBox(1100100,"")
+    end;
+    PutWindowRecord(wn,ORr);
+  end;
+  CloseWindow(nwn);
+
+  return;
+end;

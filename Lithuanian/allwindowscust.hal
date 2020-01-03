@@ -1,0 +1,146 @@
+/* Needs to be Translated to LIT */
+
+
+SetLangMode(LangLithuanian,"LIT",2);
+
+window PL_SVOSerSClass:1
+  wtag("language","LIT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  WindowBegin("Įstatyti žinomą serijinį nr.",PL_SVOSerSClass,CGslist,SVOSerView);
+  SetWRect(20,80,600,291);
+  Sizeable(-1,-1,0,0);
+  UseView(SVOSerVc);
+  SpawnClass(SVOSerDClass);
+  RecordList(4,17,-21,-39);
+  RlColKey(4,2,"Ser. nr.",SerialNr,false,CustMainKey);
+//  RlCol(74,71,"In Stock",xInStock,false);
+  RlCol(120,120,"Pirk.",CustCode,false);
+  RlCol(200,200,"Pavadinimas",CustName,false);
+  RlColKey(300,300,"Prekė",ItemCode,false,CustItemCode);
+  RlColKey(380,380,"Aprašymas",ItemName,false,CustItemName);
+  RlCol(-140,-140,"Parduota",SoldDate,false);
+  RlCol(-70,-70,"Garantija iki",WarrantyUntil,false);
+  SpecialMenu("Ser. numerio istorija",'h',1,"SerHistSVOSerLsm");
+  SearchField("Ieškoti");
+  EndWindow;
+end;
+
+window BlankVClass:1// Edit ************************** BPI Ukraine - KramarAlexandr - Tuesday, 11 September 2018 10:27:46
+  wtag("language","LIT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  real h,v,vs;
+  WindowBegin("Maintenance",BlankVClass,CGMnt,RcType);
+  SetWRect(20,93,412,250);
+  v = 10; vs = 20; h = 120;
+  EndWindow;
+end;
+
+window BLT_UpdatePIPriceDClass:1// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 23 August 2018 13:50:48
+  wtag("language","LIT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  real h,v,vs;
+
+  WindowBegin("Atnaujinti Kainas",BLT_UpdatePIPriceDClass,CGview,-);
+  SetWRect(20,100,630,200);
+  UseView(BLT_UpdatePIPriceVc);
+  Sizeable(-1,-1,0,0); //EBS
+  h = 120; v = 6; vs = 20;
+  EditField(h,v,160,"Nr.",ViewOnly,SerNr,false,0);
+  EditField(h,v+=vs,100,"Tiekėjas",Normal,VECode,false,VESClass);
+  EditField(h+160,v,-40,"Pavadinimas",Normal,VEName,false,0);
+  MatrixBegin(4,v+=40,-32,-40,-,10000);
+  MatColTL(1,34,"Prekės kodas",0,M4Code,ViewOnly,20,ArtCode,false,INSClass);
+  MatColTL(1,134,"Aprašymas",0,M4Str,ViewOnly,255,Spec,false,0);
+  MatColTL(1,-300,"Sena kaina",0,M45Val,ViewOnly,0,OldPrice,false,0);
+  MatCol(1,-200,"Nauja kaina",0,NewPrice,true,0);
+  MatCol(1,-100,"Delivery Days",0,PlannedDelDays,true,0);
+  EndMatrix;
+  SpecialMenu("Atnaujinti kainas",'',0,"BLT_UpdatePricessm");
+  EndWindow;
+
+end;
+
+window BLT_UpdatePIPriceLClass:1// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 23 August 2018 13:48:50
+  wtag("language","LIT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  WindowBegin("Atnaujinti Kainas",BLT_UpdatePIPriceLClass,CGmlist,-);
+  SpawnClass(BLT_UpdatePIPriceDClass);
+  SetWRect(64,80,509,320);
+  Sizeable(-1,-1,0,0);
+  UseView(BLT_UpdatePIPriceVc);
+  RecordList(4,17,-21,-39);
+  RlColKey(4,2,"Nr.",SerNr,false,SerNr);
+  RlColKey(100,100, "Tiekėjas",VECode,false,VECode);
+  RlCol(200,200,"Pavadinimas",VEName,false);
+  SearchField("Ieškoti");
+  EndWindow;
+end;
+
+window INMinLevelUpdateWClass:1
+  wtag("language","LIT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  real h,v,h1,vs;
+  
+  WindowBegin("Update item minimum levels",INMinLevelUpdateWClass,CGOther,-);
+  UseView(ORVc);
+  SetWRect(20,80,500,550);
+  Sizeable(1150,-1,1150,0);
+  h = 8; v = 20;
+  h1=34;vs = 20;
+  ColourPushButton(50,10,250,50,"PLD_UpdateINMinBtn","Update Minimums",35);
+  MatrixBegin(40,80,-50,-40,-,999);
+  MatCol(1,h1,"Item Code",0,ArtCode,false,INSClass);
+  MatCol(1,h1+=125,"Minimum Level",0,Quant,false,0);
+  EndMatrix;
+  EndWindow;
+end;
+
+window PLD_CreatePricesWClass:1
+  wtag("language","LIT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  real h,v,h1,vs;
+  
+  WindowBegin("Create Prices Records",PLD_CreatePricesWClass,CGOther,-);
+  UseView(RcVc);
+  SetWRect(20,80,500,120);
+  AutoSizeWindow(false);
+  h = 150; v = 20;
+  h1=34;vs = 20;
+  ToolBar;
+  HalPushButton(-140,5,-80,22,"PLD_CreatePrices","Create");
+  EndToolBar;
+  EditField(h,v=15,100,"Price Until Date",Normal,d1,false,PasteCurDate);
+  EndWindow;
+end;
+
+window PL_LinkedItemLClass:1
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  WindowBegin("Linked Items",PL_LinkedItemLClass,CGmlist,-);
+  SetWRect(20,80,660,298);
+  Sizeable(-1,-1,0,0);
+  SpawnClass(PL_LinkedItemDClass);
+  UseView(PL_LinkedItemVc);
+  RecordList(4,17,-21,-39);
+  RlColKey(4,4,"No",SerNr,false,SerNr);
+  RlCol(130,130,"Comment",Comment,false);
+  SearchField("Search");
+  EndWindow;
+end;
+
+window PL_LinkedItemDClass:1
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  real h,v,vs,v2,vs2,hm,h2;
+  WindowBegin("Linked Item",PL_LinkedItemDClass,CGview,-);
+  SetWRect(20,80,600,339);
+  UseView(PL_LinkedItemVc);
+  vs=20; h=100; vs2=16; hm=-100; h2 = 300;
+  EditField(h,v=6,100,"No",Normal,SerNr,false,);
+  EditField(h2,v,-40,"Comment",Normal,Comment,false,0);
+  MatrixBegin(10,v+=vs+30,-40,-20,-,99);
+  MatCol(1,24,"Item",0,ArtCode,false,INSClass);
+  MatCol(1,134,"Name",0,Spec,false,0);
+  EndMatrix;
+  EndWindow;
+end;

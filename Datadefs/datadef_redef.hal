@@ -39,6 +39,10 @@ begin
     KeySegment(SerialNr);
     KeySegment(ItemCode);
   EndRecordAdd;
+
+  RecordAddBegin(PLVc,"PL_PLVc");
+  RecordField(DateUntil,M4Date,0,0);
+  EndRecordAdd;
   
   return;
 end;

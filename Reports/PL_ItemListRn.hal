@@ -1,0 +1,324 @@
+//<halrule>server-only</halrule>
+external inner function val GetStockQty(string,string,Date,Boolean);
+external inner function Boolean GetItemNameStr(Integer,var string,string,string,string);
+external inner procedure HTArtSel(string,string,var string);
+external inner procedure HTLocations(string, string, var string);
+external inner function Boolean SetInSet2(string,string);
+
+procedure GetSalesHistory(string item,string location,Integer weekto,Integer weekfrom,var Longint scnt)
+begin
+  Longint res;
+  Boolean TrHs;
+  Date sd,ed;
+  record ItemHistVc IHr;
+  
+  ed = AddDay(CurrentDate,-(7*weekfrom));
+  sd = AddDay(ed,-6);
+  scnt = 0;
+
+  IHr.FileName = "IVVc";
+  IHr.ArtCode = item;
+  IHr.TransDate = sd;
+  TrHs = true;
+  while (LoopKey("FNArtCode",IHr,3,TrHs)) begin
+    if (IHr.FileName!="IVVc" or IHr.ArtCode!=item or IHr.TransDate>ed) then begin
+      TrHs = false;
+    end else begin
+      if (blank(location) or IHr.Location==location) then begin
+        scnt = scnt - IHr.Qty;
+      end;
+    end;
+  end;
+
+  return;
+end;
+
+function Boolean IsDefaultSupplier(string supp,string item)
+begin
+  Boolean res;
+  record PIVc PIr;
+
+  PIr.ItemCode = item;
+  PIr.VECode = supp;
+  if (ReadFirstKey("Vendor",PIr,2,true)) then begin
+    if (PIr.DefaultChoice==1) then begin
+      res = true;
+    end;
+  end;  
+
+  IsDefaultSupplier = res;
+  return;
+end;
+
+global
+procedure ArtRn(record RcVc RepSpec)
+begin
+  Record INVc INr;
+  record ITVc ITr;
+  Boolean TrHs,foundf;
+  val sum1;
+  String 255 lastgroup,fromart,toart,frcc,tocc,ckey,namestr,tstr;
+  Integer keys,rw,i;
+  Longint scnt;
+  Boolean itemout;
+  Boolean testf;
+  val qty;
+  val instock;
+  record PLVc PLLr;  
+  Integer step,cs;
+
+  if (RepSpec.ArtMode==0) then begin
+    inner.ArtRn(RepSpec);
+    goto LArtRn;
+  end;
+
+  step = 15;
+  cs = 290;
+  rw = 1;
+  fromart = FirstInRange(RepSpec.f1,20);
+  toart = LastInRange(RepSpec.f1,20);
+  frcc = FirstInRange(RepSpec.f3,20);
+  tocc = LastInRange(RepSpec.f3,20);
+
+  itemout = false;
+  lastgroup = "";
+
+  StartReportJob(USetStr(2324));
+  HTArtSel(RepSpec.f1,RepSpec.f3,tstr);
+  Header(rw,tstr,1);
+  rw = rw + 1;
+  if (RepSpec.flags[2]==0) then begin
+    tstr = USetStr(1187);
+  end;
+  if (RepSpec.flags[2]==1) then begin
+    tstr = USetStr(1188);
+  end;
+  if (RepSpec.flags[2]==2) then begin
+    tstr = USetStr(1189);
+  end;
+  Header(rw,tstr,1);
+  rw = rw + 1;
+  if (nonblank(RepSpec.f3)) then begin 
+    tstr = USetStr(1135);
+    tstr = tstr & RepSpec.f3;
+    Header(rw,tstr,1);
+    rw = rw + 1;
+  end;
+  if (nonblank(RepSpec.AccStr)) then begin 
+    tstr = USetStr(1156);
+    tstr = tstr & RepSpec.AccStr;
+    Header(rw,tstr,1);
+    rw = rw + 1;
+  end;
+  HTLocations(RepSpec.f5,RepSpec.f5,tstr);
+  Header(rw,tstr,1);
+  rw = rw + 1;
+  if (nonblank(RepSpec.FirstAcc)) then begin 
+    tstr = USetStr(2321) & ": " & RepSpec.FirstAcc;
+    Header(rw,tstr,1);
+    rw = rw + 1;
+  end;
+  EndHeader;
+
+
+  SetRepCol(2,50);
+  SetRepCol(3,200);
+  SetRepCol(4,250);
+  StartFormat(15);
+  OutString(0,0,USetStr(2325),false);
+  OutString(2,0,USetStr(2326),false);
+  OutString(3,0,USetStr(1348),true);
+  OutString(4,0,USetStr(2330),true);
+  for (i=13;i>=1;i=i-1) begin
+    OutString(cs+((13-i)*step),0,(i) & ".." & ((i-1)),true);  
+  end;
+  EndFormat;
+  sum1 = 0;
+  if (RepSpec.flags[2]==0) then begin
+    INr.Code = fromart;
+    ckey = "Code";
+    keys = 1;
+  end;
+  if (RepSpec.flags[2]==1) then begin
+    INr.Group = frcc;
+    INr.Code = fromart;
+    ckey = "Group";
+    keys = 2;
+  end;
+  if (RepSpec.flags[2]==2) then begin
+    INr.Name = "";
+    ckey = "Name";
+    keys = 1;
+  end;
+  Gray_Divider(0,1);
+  TrHs = true;
+  while (LoopKey(ckey,INr,keys,TrHs)) begin
+    TrHs = true;
+    testf = true;
+    if (RepSpec.flags[2]==0) then begin
+      if (TrHs) then begin
+       if (tocc<>"") then begin
+        if (INr.Group > tocc) then begin
+          testf = false;
+        end;
+       end;
+      end;
+      if (TrHs) then begin
+       if (frcc<>"") then begin
+        if (INr.Group < frcc) then begin
+          testf = false;
+        end;
+       end;
+      end;
+      if (TrHs) then begin
+       if (toart<>"") then begin
+        if (INr.Code > toart) then begin
+          TrHs = false;
+        end;
+       end;
+      end;
+    end;
+    if (RepSpec.flags[2]==1) then begin
+      if (TrHs) then begin
+       if (tocc<>"") then begin
+        if (INr.Group > tocc) then begin
+          TrHs = false;
+        end;
+       end;
+      end;
+      if (TrHs) then begin
+       if (toart<>"") then begin
+        if (INr.Code > toart) then begin
+          testf = false;
+        end;
+       end;
+      end;
+      if (TrHs) then begin
+       if (fromart<>"") then begin
+        if (INr.Code < fromart) then begin
+          testf = false;
+        end;
+       end;
+      end;
+    end;
+    if (RepSpec.flags[2]==2) then begin
+      if (TrHs) then begin
+       if (tocc<>"") then begin
+        if (INr.Group > tocc) then begin
+          testf = false;
+        end;
+       end;
+      end;
+      if (TrHs) then begin
+       if (frcc<>"") then begin
+        if (INr.Group < frcc) then begin
+          testf = false;
+        end;
+       end;
+      end;
+      if (TrHs) then begin
+       if (nonblank(toart)) then begin
+        if (INr.Code > toart) then begin
+          testf = false;
+        end;
+       end;
+      end;
+      if (TrHs) then begin
+       if (nonblank(fromart)) then begin
+        if (INr.Code < fromart) then begin
+          testf = false;
+        end;
+       end;
+      end;
+    end;
+    if (TrHs==false) then begin
+      testf = false;
+    end;
+    if (testf) then begin
+      if (nonblank(RepSpec.f4)) then begin
+        if (SetInSet2(RepSpec.f4,INr.DispGroups)==false) then begin
+          testf = false;
+        end;
+      end; 
+      if (INr.Terminated<>0) then begin
+        if (RepSpec.flags[10]==0) then begin
+          testf = false;
+        end;
+      end;
+      if (RepSpec.flags[3]==0) then begin
+        if (INr.ItemType==0) then begin
+          testf = false;
+        end;
+      end;
+      if (RepSpec.flags[4]==0) then begin
+        if (INr.ItemType==1) then begin
+          testf = false;
+        end;
+      end;
+      if (RepSpec.flags[5]==0) then begin
+        if (INr.ItemType==2) then begin
+          testf = false;
+        end;
+      end;
+      if (RepSpec.flags[6]==0) then begin
+        if (INr.ItemType==3) then begin
+          testf = false;
+        end;
+      end;
+      if (nonblank(RepSpec.f6) and IsDefaultSupplier(RepSpec.f6,INr.Code)==false) then begin
+        testf = false;
+      end;
+    end;
+    if (testf) then begin
+      if (GetItemNameStr(1,namestr,RepSpec.Stext,INr.Name,INr.Code)) then begin end;
+      if (RepSpec.flags[2]==1) then begin
+        if (lastgroup <> INr.Group) then begin
+          if (itemout==true) then begin
+            Gray_Divider(0,1);
+          end;
+          StartFormat(15);
+          OutString(20,0,INr.Group,false);
+          ITr.Code=INr.Group;
+          if (ReadFirstMain(ITr,1,true)) then begin
+            OutString(100,0,ITr.Comment,false);
+          end;
+          EndFormat;
+          Gray_Divider(0,1);
+          lastgroup = INr.Group;
+        end;
+      end;
+      itemout = true;
+      StartFormat(15);
+      OutString(0,"DblINVc",INr.Code,false);
+      switch (RepSpec.Media) begin
+        case mtScreen:  
+          OutString(2,0,left(namestr,60),false);
+        otherwise
+          OutString(2,0,namestr,false);
+      end;    
+      instock = GetStockQty(INr.Code,RepSpec.f5,CurrentDate,false);
+      if (instock==0) then begin
+        instock = blankval; 
+      end;
+      OutString(3,0,INr.MinLevel,true);
+      OutString(4,0,instock,true);
+      //get sales balances for period;
+      for (i=13;i>=1;i=i-1) begin
+        GetSalesHistory(INr.Code,RepSpec.f5,i,i-1,scnt);
+        OutString(cs+((13-i)*step),0,scnt,true);
+      end;
+      EndFormat;
+      qty = qty + 1;
+    end;
+  end;
+  if (RepSpec.Media==mtScreen) then begin 
+    Gray_Divider(0,1);
+    StartFormat(15);
+    OutValBiDi(0,0,qty,M40Val,false,85);
+    EndFormat;
+  end;
+  EndJob;
+
+LArtRn:;
+  return;
+end;

@@ -1,0 +1,70 @@
+SetLangMode(LangEnglish,"ENG",0);
+
+window INMinLevelUpdateWClass:1
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  real h,v,h1,vs;
+  
+  WindowBegin("Update item minimum levels",INMinLevelUpdateWClass,CGOther,-);
+  UseView(ORVc);
+  SetWRect(20,80,500,550);
+  Sizeable(1150,-1,1150,0);
+  h = 8; v = 20;
+  h1=34;vs = 20;
+  ColourPushButton(50,10,250,50,"PLD_UpdateINMinBtn","Update Minimums",35);
+  MatrixBegin(40,80,-50,-40,-,999);
+  MatCol(1,h1,"Item Code",0,ArtCode,false,INSClass);
+  MatCol(1,h1+=125,"Minimum Level",0,Quant,false,0);
+  EndMatrix;
+  EndWindow;
+end;
+
+window PLD_CreatePricesWClass:1
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  real h,v,h1,vs;
+  
+  WindowBegin("Create Prices Records",PLD_CreatePricesWClass,CGOther,-);
+  UseView(RcVc);
+  SetWRect(20,80,500,120);
+  AutoSizeWindow(false);
+  h = 150; v = 20;
+  h1=34;vs = 20;
+  ToolBar;
+  HalPushButton(-140,5,-80,22,"PLD_CreatePrices","Create");
+  EndToolBar;
+  EditField(h,v=15,100,"Price Until Date",Normal,d1,false,PasteCurDate);
+  EndWindow;
+end;
+
+window PL_LinkedItemLClass:1
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  WindowBegin("Linked Items",PL_LinkedItemLClass,CGmlist,-);
+  SetWRect(20,80,660,298);
+  Sizeable(-1,-1,0,0);
+  SpawnClass(PL_LinkedItemDClass);
+  UseView(PL_LinkedItemVc);
+  RecordList(4,17,-21,-39);
+  RlColKey(4,4,"No",SerNr,false,SerNr);
+  RlCol(130,130,"Comment",Comment,false);
+  SearchField("Search");
+  EndWindow;
+end;
+
+window PL_LinkedItemDClass:1
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  real h,v,vs,v2,vs2,hm,h2;
+  WindowBegin("Linked Item",PL_LinkedItemDClass,CGview,-);
+  SetWRect(20,80,600,339);
+  UseView(PL_LinkedItemVc);
+  vs=20; h=100; vs2=16; hm=-100; h2 = 300;
+  EditField(h,v=6,100,"No",Normal,SerNr,false,);
+  EditField(h2,v,-40,"Comment",Normal,Comment,false,0);
+  MatrixBegin(10,v+=vs+30,-40,-20,-,99);
+  MatCol(1,24,"Item",0,ArtCode,false,INSClass);
+  MatCol(1,134,"Name",0,Spec,false,0);
+  EndMatrix;
+  EndWindow;
+end;

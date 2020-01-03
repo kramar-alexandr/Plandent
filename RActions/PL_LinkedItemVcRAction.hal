@@ -1,0 +1,28 @@
+//<halrule>server-only</halrule>
+
+global
+updating function LongInt PL_LinkedItemVcRecordCheck(var record PL_LinkedItemVc PLp,record PL_LinkedItemVc PL2p,LongInt stat,LongInt check)
+begin
+  LongInt res;
+ 
+  res = 0;
+  if (PLp.SerNr<=0) then begin
+    PLp.SerNr = NextSerNr("PL_LinkedItemVc",CurrentDate,-1,false,"");
+  end;
+  PL_LinkedItemVcRecordCheck = res;
+  return;
+end;
+
+global
+updating function LongInt PL_LinkedItemVcRecordDuplicate(var record PL_LinkedItemVc PLp,record PL_LinkedItemVc PL2p,LongInt stat,LongInt check)
+begin
+  LongInt res;
+ 
+  res = 0;
+  PLp.SerNr = -1;
+  
+  PL_LinkedItemVcRecordDuplicate = res;
+  return;
+end;
+
+

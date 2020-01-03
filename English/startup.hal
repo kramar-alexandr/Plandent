@@ -1,0 +1,17 @@
+event startup
+begin
+  Real h,v,l,vs;
+
+  SetLangMode(LangEnglish,"ENG",0);
+
+	Setting("Update Item Minimum Levels",INMinLevelUpdateWClass,modIN);
+
+	Setting("Linked Items",PL_LinkedItemLClass,modSO);
+
+
+  SString(1100100,"Item Minimums Updated Successfully");
+  SString(1100101,"Item not found");
+  SString(1100102,"Price is from item card");
+
+  return;
+end;

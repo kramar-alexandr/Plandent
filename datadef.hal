@@ -24,13 +24,14 @@ SOURCEFILE("halcust\\level0\\alocalizations\\WActions",0);
 
 SOURCEFILE("halcust\\Documents",3);
 SOURCEFILE("halcust\\Exports",3);
+SOURCEFILE("halcust\\English",0);
 SOURCEFILE("halcust\\Imports",3);
 SOURCEFILE("halcust\\Maint",3);
 SOURCEFILE("halcust\\RActions",3);
 SOURCEFILE("halcust\\Reports",3);
 SOURCEFILE("halcust\\Tools",3);
 SOURCEFILE("halcust\\WActions",3);
-SOURCEFILE("halcust\\Windows",3);
+SOURCEFILE("halcust\\Lithuanian",0);
 SOURCEFILE("halcust\\Swedbank",3);
 SOURCEFILE("halcust\\Datadefs",3);
 
@@ -46,6 +47,7 @@ begin
 		ArrayField(Spec,M4Str,255,0);
 		ArrayField(OldPrice,M45Val,0,0);
 		ArrayField(NewPrice,M45Val,0,0);
+    ArrayField(PlannedDelDays,M4UVal,0,0);
 		EndArray;
 		MainKeyBegin(SerNr,0);
 		KeySegment(SerNr);
@@ -173,6 +175,6 @@ begin
 		RecordField(DefSearchInv,M4Int,0,0);
 		RecordField(InvFIFO,M4Int,0,0);
 	EndBlock;
-	
+
   return;
 end;

@@ -1,0 +1,16 @@
+global
+procedure ArtRClassReportDefaults(Integer wn)
+BEGIN
+  record RcVc RepSpec;
+  
+  inner.ArtRClassReportDefaults(wn);
+  DeselectWindow(wn,false);
+  GetWindowRecord(wn,RepSpec);
+  RepSpec.flags[3] = 0;
+  RepSpec.flags[4] = 1;
+  RepSpec.flags[5] = 0;
+  RepSpec.flags[6] = 0;
+  PutWindowRecord(wn,RepSpec);
+  SelectWindow(wn);
+  RETURN;
+END;

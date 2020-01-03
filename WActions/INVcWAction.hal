@@ -1,0 +1,19 @@
+global
+procedure INRunArtRnDsm()
+begin
+  record INVc INr;
+  record RcVc RepSpec;
+  record MainStockBlock MSb;
+
+  BlockLoad(MSb)
+  GetWindowRecord(CurWindow,INr);
+  RepSpec.repname = "ArtRn";
+  RepSpec.Media = mtScreen;
+  RepSpec.f1 = INr.Code;
+  RepSpec.f5 = MSb.MainStock;
+  RepSpec.flags[4] = 1;
+  RepSpec.ArtMode = 1;
+  RunReport(RepSpec,0);
+
+  return;
+end;

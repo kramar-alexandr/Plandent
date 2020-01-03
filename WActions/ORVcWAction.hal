@@ -1,0 +1,50 @@
+remote inner function Boolean ORVc_PasteArtCode(var record ORVc,Integer,var string,var string,Boolean);
+remote function Boolean PL_ORVc_PasteArtCode(var record ORVc,Integer,var string);
+external inner function Boolean ORDClassSwitchRow(Integer,Integer);
+
+function Boolean ORDClassArtCodeEFAfter(Integer wn,Integer rownr,Boolean changedf)
+begin
+  Boolean res;
+  record ORVc ORr;
+  row ORVc ORrw;
+  record INVc INr;
+  string 255 inwarning,warning;
+
+  res = true;
+  if (changedf) then begin
+    GetWindowRecord(wn,ORr);
+    MatRowGet(ORr,rownr,ORrw);
+    if (ORVc_PasteArtCode(ORr,rownr,inwarning,warning,false)) then begin
+    end;
+    if (nonblank(inwarning)) then begin
+      MessageBox(0,inwarning);
+    end;
+    if (nonblank(warning)) then begin
+      MessageBox(0,warning);
+    end;
+    warning = "";
+    PL_ORVc_PasteArtCode(ORr,rownr,warning);
+    if (nonblank(warning)) then begin
+      MessageBox(0,warning);      
+    end;
+    PutWindowRecord(wn,ORr);
+    if (ORDClassSwitchRow(wn,rownr)) then begin end;  
+  end;
+  ORDClassArtCodeEFAfter = res;
+  return;
+end;
+
+global
+function Boolean ORDClassAfterEditField(Integer wn,string fieldname,Integer fn, Integer rownr,Integer changed)
+begin
+  Boolean res;
+  
+  switch (fieldname) begin
+    case "ArtCode": res = ORDClassArtCodeEFAfter(wn,rownr,changed!=0);
+    otherwise
+      res = inner.ORDClassAfterEditField(wn,fieldname,fn,rownr,changed);
+  end;
+
+  ORDClassAfterEditField = res;
+  return;
+end;

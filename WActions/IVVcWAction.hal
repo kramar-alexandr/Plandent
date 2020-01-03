@@ -1,0 +1,51 @@
+remote inner function Boolean IVVc_PasteArtCode(var record IVVc,Integer,var string,var string,Boolean,var Integer);
+remote function Boolean PL_IVVc_PasteArtCode(var record IVVc,Integer,var string);
+external inner function Boolean IVDClassSwitchRow(Integer,Integer);
+
+function Boolean IVDClassArtCodeEFAfter(Integer wn,Integer rownr,Boolean changedf)
+begin
+  Boolean res;
+  record IVVc IVr;
+  row IVVc IVrw;
+  record INVc INr;
+  string 255 inwarning,warning;
+  Integer sernrf;
+
+  res = true;
+  if (changedf) then begin
+    GetWindowRecord(wn,IVr);
+    MatRowGet(IVr,rownr,IVrw);
+    if (IVVc_PasteArtCode(IVr,rownr,inwarning,warning,false,sernrf)) then begin
+    end;
+    if (nonblank(inwarning)) then begin
+      MessageBox(0,inwarning);
+    end;
+    if (nonblank(warning)) then begin
+      MessageBox(0,warning);
+    end;
+    warning = "";
+    PL_IVVc_PasteArtCode(IVr,rownr,warning);
+    if (nonblank(warning)) then begin
+      MessageBox(0,warning);      
+    end;
+    PutWindowRecord(wn,IVr);
+    if (IVDClassSwitchRow(wn,rownr)) then begin end;  
+  end;
+  IVDClassArtCodeEFAfter = res;
+  return;
+end;
+
+global
+function Boolean IVDClassAfterEditField(Integer wn,string fieldname,Integer fn, Integer rownr,Integer changed)
+begin
+  Boolean res;
+  
+  switch (fieldname) begin
+    case "ArtCode": res = IVDClassArtCodeEFAfter(wn,rownr,changed!=0);
+    otherwise
+      res = inner.IVDClassAfterEditField(wn,fieldname,fn,rownr,changed);
+  end;
+
+  IVDClassAfterEditField = res;
+  return;
+end;
