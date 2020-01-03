@@ -245,7 +245,7 @@ begin
 end;
 
 global
-procedure PL_ORVc_PasteArtCode(record ORVc ORr,Integer rownr,var string warning)
+procedure PL_ORVc_PasteArtCode(var record ORVc ORr,Integer rownr,var string warning)
 begin
   Boolean pricef;
   row ORVc ORrw;
@@ -281,7 +281,7 @@ begin
 end;
 
 global
-procedure PL_IVVc_PasteArtCode(record IVVc IVr,Integer rownr,var string warning)
+procedure PL_IVVc_PasteArtCode(var record IVVc IVr,Integer rownr,var string warning)
 begin
   Boolean pricef;
   row IVVc IVrw;
@@ -317,7 +317,7 @@ begin
 end;
 
 global
-procedure PL_QTVc_PasteArtCode(record QTVc QTr,Integer rownr,var string warning)
+procedure PL_QTVc_PasteArtCode(var record QTVc QTr,Integer rownr,var string warning)
 begin
   Boolean pricef;
   row QTVc QTrw;

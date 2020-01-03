@@ -1,5 +1,5 @@
 remote inner function Boolean QTVc_PasteArtCode(var record QTVc,Integer,var string,var string);
-remote function Boolean PL_QTVc_PasteArtCode(var record QTVc,Integer,var string);
+remote procedure PL_QTVc_PasteArtCode(var record QTVc,Integer,var string);
 external inner function Boolean QTDClassSwitchRow(Integer,Integer);
 remote updating procedure PLD_CreatePricesRemote(record RcVc);
 

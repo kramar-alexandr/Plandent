@@ -1,5 +1,5 @@
 remote inner function Boolean ORVc_PasteArtCode(var record ORVc,Integer,var string,var string,Boolean);
-remote function Boolean PL_ORVc_PasteArtCode(var record ORVc,Integer,var string);
+remote procedure PL_ORVc_PasteArtCode(var record ORVc,Integer,var string);
 external inner function Boolean ORDClassSwitchRow(Integer,Integer);
 
 function Boolean ORDClassArtCodeEFAfter(Integer wn,Integer rownr,Boolean changedf)

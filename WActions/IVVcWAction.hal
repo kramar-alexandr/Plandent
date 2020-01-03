@@ -1,5 +1,5 @@
 remote inner function Boolean IVVc_PasteArtCode(var record IVVc,Integer,var string,var string,Boolean,var Integer);
-remote function Boolean PL_IVVc_PasteArtCode(var record IVVc,Integer,var string);
+remote procedure PL_IVVc_PasteArtCode(var record IVVc,Integer,var string);
 external inner function Boolean IVDClassSwitchRow(Integer,Integer);
 
 function Boolean IVDClassArtCodeEFAfter(Integer wn,Integer rownr,Boolean changedf)
