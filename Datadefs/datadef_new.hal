@@ -16,5 +16,11 @@ begin
   KeySegment(SerNr);
   EndRecord;
 
+  BlockBegin(PL_PriceNotifBlock,-,"");
+  RecordField(IVFlag,M4Int,0,0);
+  RecordField(QTFlag,M4Int,0,0);
+  RecordField(ORFlag,M4Int,0,0);
+  EndBlock;
+
   return;
 end;

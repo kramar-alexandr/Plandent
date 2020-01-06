@@ -7,6 +7,7 @@ begin
 	Setting("Update Item Minimum Levels",INMinLevelUpdateWClass,modIN);
 
 	Setting("Linked Items",PL_LinkedItemLClass,modSO);
+	Setting("Price Records Alerts",PL_PriceNotifTClass,modSO);
 
 
   SString(1100100,"Item Minimums Updated Successfully");

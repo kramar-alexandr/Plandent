@@ -68,3 +68,19 @@ begin
   EndMatrix;
   EndWindow;
 end;
+
+window PL_PriceNotifTClass:1
+  wtag("language","LIT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  real v;
+  WindowBegin("Price Record Alert",PL_PriceNotifTClass,CGSbl,-);
+  SetBlid(PL_PriceNotifBlock);
+  SetWRect(64,80,512,148);
+  v = 6;
+  CheckBox(30,v=10,0,"Sales Invoices Records",IVFlag);
+  CheckBox(30,v+=20,0,"Sales Orders Records",ORFlag);
+  CheckBox(30,v+=20,0,"Quatations Records",QTFlag);
+
+  EndWindow;
+end;
+

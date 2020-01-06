@@ -258,7 +258,7 @@ begin
   Boolean dummyf;
   record TaxMatrixVc TMr;
   Time blankt;
-
+  record PL_PriceNotifBlock PNb;
 
   MatRowGet(ORr,rownr,ORrw);
   if (PL_GetItemPriceDiscount3(ORrw.ArtCode,ORrw.Quant,INr,ORr.CurncyCode,
@@ -266,7 +266,8 @@ begin
                             ORr.LangCode,ORr.CustCat,ORr.PriceList,ORr.RebCode,
                             price,curitemname,vreb,vatcode,baseprice,salesacc,
                             ORr.ExportFlag,calcprice,orddate,blankt,ORr.CustCode,true,dummyf,ORr.PayDeal,tax2code,tax2prc,ORr.Region,location,taxtemplatecode,ORr.OrdDate,pricef)) then begin
-    if (!pricef) then begin
+    BlockLoad(PNb);
+    if (!pricef and PNb.ORFlag==1) then begin
       warning = UsetStr(1100102);
     end;
     ORrw.Price = price;
@@ -294,7 +295,7 @@ begin
   Boolean dummyf;
   record TaxMatrixVc TMr;
   Time blankt;
-
+  record PL_PriceNotifBlock PNb;
 
   MatRowGet(IVr,rownr,IVrw);
   if (PL_GetItemPriceDiscount3(IVrw.ArtCode,IVrw.Quant,INr,IVr.CurncyCode,
@@ -302,7 +303,8 @@ begin
                             IVr.LangCode,IVr.CustCat,IVr.PriceList,IVr.RebCode,
                             price,curitemname,vreb,vatcode,baseprice,salesacc,
                             IVr.ExportFlag,calcprice,orddate,blankt,IVr.CustCode,true,dummyf,IVr.PayDeal,tax2code,tax2prc,IVr.Region,location,taxtemplatecode,IVr.InvDate,pricef)) then begin
-    if (!pricef) then begin
+    BlockLoad(PNb);
+    if (!pricef and PNb.IVFlag==1) then begin
       warning = UsetStr(1100102);
     end;
     IVrw.Price = price;
@@ -330,7 +332,7 @@ begin
   Boolean dummyf;
   record TaxMatrixVc TMr;
   Time blankt;
-
+  record PL_PriceNotifBlock PNb;
 
   MatRowGet(QTr,rownr,QTrw);
   if (PL_GetItemPriceDiscount3(QTrw.ArtCode,QTrw.Quant,INr,QTr.CurncyCode,
@@ -338,7 +340,8 @@ begin
                             QTr.LangCode,QTr.CustCat,QTr.PriceList,QTr.RebCode,
                             price,curitemname,vreb,vatcode,baseprice,salesacc,
                             QTr.ExportFlag,calcprice,orddate,blankt,QTr.CustCode,true,dummyf,QTr.PayDeal,tax2code,tax2prc,QTr.Region,location,taxtemplatecode,QTr.QTDate,pricef)) then begin
-    if (!pricef) then begin
+    BlockLoad(PNb);
+    if (!pricef and PNb.QTFlag==1) then begin
       warning = UsetStr(1100102);
     end;
     QTrw.Price = price;

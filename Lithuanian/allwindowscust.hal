@@ -1,12 +1,12 @@
 /* Needs to be Translated to LIT */
 
 
-SetLangMode(LangLithuanian,"LIT",2);
+SetLangMode(LangLithuanian,"LIT",0);
 
 window PL_SVOSerSClass:1
   wtag("language","LIT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
 begin
-  WindowBegin("Ä®statyti Å¾inomÄ… serijinÄ¯ nr.",PL_SVOSerSClass,CGslist,SVOSerView);
+  WindowBegin("¯statyti ìinomˆ serijin° nr.",PL_SVOSerSClass,CGslist,SVOSerView);
   SetWRect(20,80,600,291);
   Sizeable(-1,-1,0,0);
   UseView(SVOSerVc);
@@ -16,12 +16,12 @@ begin
 //  RlCol(74,71,"In Stock",xInStock,false);
   RlCol(120,120,"Pirk.",CustCode,false);
   RlCol(200,200,"Pavadinimas",CustName,false);
-  RlColKey(300,300,"PrekÄ—",ItemCode,false,CustItemCode);
-  RlColKey(380,380,"ApraÅ¡ymas",ItemName,false,CustItemName);
+  RlColKey(300,300,"Prek˜",ItemCode,false,CustItemCode);
+  RlColKey(380,380,"Apraäymas",ItemName,false,CustItemName);
   RlCol(-140,-140,"Parduota",SoldDate,false);
   RlCol(-70,-70,"Garantija iki",WarrantyUntil,false);
   SpecialMenu("Ser. numerio istorija",'h',1,"SerHistSVOSerLsm");
-  SearchField("IeÅ¡koti");
+  SearchField("Ieäkoti");
   EndWindow;
 end;
 
@@ -46,11 +46,11 @@ begin
   Sizeable(-1,-1,0,0); //EBS
   h = 120; v = 6; vs = 20;
   EditField(h,v,160,"Nr.",ViewOnly,SerNr,false,0);
-  EditField(h,v+=vs,100,"TiekÄ—jas",Normal,VECode,false,VESClass);
+  EditField(h,v+=vs,100,"Tiek˜jas",Normal,VECode,false,VESClass);
   EditField(h+160,v,-40,"Pavadinimas",Normal,VEName,false,0);
   MatrixBegin(4,v+=40,-32,-40,-,10000);
-  MatColTL(1,34,"PrekÄ—s kodas",0,M4Code,ViewOnly,20,ArtCode,false,INSClass);
-  MatColTL(1,134,"ApraÅ¡ymas",0,M4Str,ViewOnly,255,Spec,false,0);
+  MatColTL(1,34,"Prek˜s kodas",0,M4Code,ViewOnly,20,ArtCode,false,INSClass);
+  MatColTL(1,134,"Apraäymas",0,M4Str,ViewOnly,255,Spec,false,0);
   MatColTL(1,-300,"Sena kaina",0,M45Val,ViewOnly,0,OldPrice,false,0);
   MatCol(1,-200,"Nauja kaina",0,NewPrice,true,0);
   MatCol(1,-100,"Delivery Days",0,PlannedDelDays,true,0);
@@ -70,11 +70,12 @@ begin
   UseView(BLT_UpdatePIPriceVc);
   RecordList(4,17,-21,-39);
   RlColKey(4,2,"Nr.",SerNr,false,SerNr);
-  RlColKey(100,100, "TiekÄ—jas",VECode,false,VECode);
+  RlColKey(100,100, "Tiek˜jas",VECode,false,VECode);
   RlCol(200,200,"Pavadinimas",VEName,false);
-  SearchField("IeÅ¡koti");
+  SearchField("Ieäkoti");
   EndWindow;
 end;
+
 
 window INMinLevelUpdateWClass:1
   wtag("language","LIT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
@@ -142,5 +143,20 @@ begin
   MatCol(1,24,"Item",0,ArtCode,false,INSClass);
   MatCol(1,134,"Name",0,Spec,false,0);
   EndMatrix;
+  EndWindow;
+end;
+
+window PL_PriceNotifTClass:1
+  wtag("language","LIT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  real v;
+  WindowBegin("Kain÷ °raä÷ persp˜jimas",PL_PriceNotifTClass,CGSbl,-);
+  SetBlid(PL_PriceNotifBlock);
+  SetWRect(64,80,512,148);
+  v = 6;
+  CheckBox(30,v=10,0,"Pardavim÷ knygos faktðr÷ °raäai",IVFlag);
+  CheckBox(30,v+=20,0,"Pardavim÷ uìsakym÷ °raäai ",ORFlag);
+  CheckBox(30,v+=20,0,"Pasiðlym÷ °raäai",QTFlag);
+
   EndWindow;
 end;
