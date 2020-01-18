@@ -4,32 +4,55 @@ external inner function Boolean GetItemNameStr(Integer,var string,string,string,
 external inner procedure HTArtSel(string,string,var string);
 external inner procedure HTLocations(string, string, var string);
 external inner function Boolean SetInSet2(string,string);
+external inner function Integer GetWeekNr(Date,string,var LongInt);
 
-procedure GetSalesHistory(string item,string location,Integer weekto,Integer weekfrom,var Longint scnt)
+function val GetStockHistory(string item,string location,Date sd,Date ed,string vccode)
 begin
-  Longint res;
-  Boolean TrHs;
-  Date sd,ed;
+  val res;
   record ItemHistVc IHr;
-  
-  ed = AddDay(CurrentDate,-(7*weekfrom));
-  sd = AddDay(ed,-6);
-  scnt = 0;
+  Boolean TrHs;
 
-  IHr.FileName = "IVVc";
+  res = 0;
+  IHr.FileName = vccode;
   IHr.ArtCode = item;
   IHr.TransDate = sd;
   TrHs = true;
   while (LoopKey("FNArtCode",IHr,3,TrHs)) begin
-    if (IHr.FileName!="IVVc" or IHr.ArtCode!=item or IHr.TransDate>ed) then begin
+    if (IHr.FileName!=vccode or IHr.ArtCode!=item or IHr.TransDate>ed) then begin
       TrHs = false;
     end else begin
       if (blank(location) or IHr.Location==location) then begin
-        scnt = scnt - IHr.Qty;
+        res = res + IHr.Qty;
       end;
     end;
   end;
 
+  GetStockHistory = res;
+  return;
+end;
+
+procedure GetSalesHistory(string item,string location,Date sd,var Longint scnt)
+begin
+  Longint res;
+  Date ed;
+  
+  ed = AddDay(sd,6);
+  scnt = GetStockHistory(item,location,sd,ed,"IVVc");
+
+  return;
+end;
+
+function val GetReceivedQty(string item,string location,Date td)
+begin
+  val res;
+  Date ed,sd;
+  
+  sd = AddDay(td,-(13*7));
+  ed = CurrentDate;
+  res = GetStockHistory(item,location,sd,ed,"PUVc");
+  res = res + GetStockHistory(item,location,sd,ed,"RetPUVc");
+
+  GetReceivedQty = res;
   return;
 end;
 
@@ -59,13 +82,15 @@ begin
   val sum1;
   String 255 lastgroup,fromart,toart,frcc,tocc,ckey,namestr,tstr;
   Integer keys,rw,i;
-  Longint scnt;
+  Longint scnt,maxwk;
   Boolean itemout;
   Boolean testf;
-  val qty;
+  val qty,tot;
   val instock;
   record PLVc PLLr;  
-  Integer step,cs;
+  Integer step,cs,wknr,cs2;
+  record PIVc PIr;
+  Date td,sd;
 
   if (RepSpec.ArtMode==0) then begin
     inner.ArtRn(RepSpec);
@@ -74,6 +99,7 @@ begin
 
   step = 15;
   cs = 290;
+  cs2 = 290+(13*step)+30;
   rw = 1;
   fromart = FirstInRange(RepSpec.f1,20);
   toart = LastInRange(RepSpec.f1,20);
@@ -129,9 +155,16 @@ begin
   OutString(2,0,USetStr(2326),false);
   OutString(3,0,USetStr(1348),true);
   OutString(4,0,USetStr(2330),true);
-  for (i=13;i>=1;i=i-1) begin
-    OutString(cs+((13-i)*step),0,(i) & ".." & ((i-1)),true);  
+  sd = AddDay(CurrentDate,-(GetDateID(CurrentDate)-1));
+  for (i=12;i>=0;i=i-1) begin
+    td = AddDay(sd,-(i*7));
+    wknr = GetWeekNr(td,"",maxwk);
+    OutString(cs+((13-i)*step),0,Right(td.year,2) & "/" & wknr,true);  
   end;
+  OutString(cs2+30,0,USetStr(16388),true);//delivery days
+  OutString(cs2+60,0,USetStr(17124),true);//Average
+  OutString(cs2+90,0,USetStr(12730),true);//Received
+  OutString(cs2+120,0,USetStr(16165),true);//Delivered
   EndFormat;
   sum1 = 0;
   if (RepSpec.flags[2]==0) then begin
@@ -270,6 +303,7 @@ begin
       end;
     end;
     if (testf) then begin
+      tot = 0;
       if (GetItemNameStr(1,namestr,RepSpec.Stext,INr.Name,INr.Code)) then begin end;
       if (RepSpec.flags[2]==1) then begin
         if (lastgroup <> INr.Group) then begin
@@ -303,10 +337,23 @@ begin
       OutString(3,0,INr.MinLevel,true);
       OutString(4,0,instock,true);
       //get sales balances for period;
-      for (i=13;i>=1;i=i-1) begin
-        GetSalesHistory(INr.Code,RepSpec.f5,i,i-1,scnt);
+      for (i=12;i>=0;i=i-1) begin
+        td = AddDay(sd,-(i*7));
+        GetSalesHistory(INr.Code,RepSpec.f5,td,scnt);
+        tot = tot + scnt;
         OutString(cs+((13-i)*step),0,scnt,true);
       end;
+      ResetLoop(PIr);
+      PIr.ItemCode = INr.Code;
+      PIr.DefaultChoice = 1;
+      if (ReadFirstKey("DefaultChoice",PIr,2,true)) then begin
+        OutString(cs2+30,0,PIr.PlannedDelDays,true);
+      end else begin
+        OutString(cs2+30,0,"",true);
+      end;
+      OutString(cs2+60,0,tot/13,true);//Average
+      OutString(cs2+90,0,GetReceivedQty(INr.Code,RepSpec.f5,sd),true);//Received
+      OutString(cs2+120,0,tot,true);//Delivered
       EndFormat;
       qty = qty + 1;
     end;
