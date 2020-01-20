@@ -90,16 +90,16 @@ begin
   record PLVc PLLr;  
   Integer step,cs,wknr,cs2;
   record PIVc PIr;
-  Date td,sd;
+  Date td,sd,ed;
 
   if (RepSpec.ArtMode==0) then begin
     inner.ArtRn(RepSpec);
     goto LArtRn;
   end;
 
-  step = 15;
-  cs = 290;
-  cs2 = 290+(13*step)+30;
+  step = 10;
+  cs = 220;
+  cs2 = cs+(13*step);
   rw = 1;
   fromart = FirstInRange(RepSpec.f1,20);
   toart = LastInRange(RepSpec.f1,20);
@@ -147,9 +147,9 @@ begin
   EndHeader;
 
 
-  SetRepCol(2,50);
-  SetRepCol(3,200);
-  SetRepCol(4,250);
+  SetRepCol(2,40);
+  SetRepCol(3,190);
+  SetRepCol(4,220);
   StartFormat(15);
   OutString(0,0,USetStr(2325),false);
   OutString(2,0,USetStr(2326),false);
@@ -159,7 +159,8 @@ begin
   for (i=12;i>=0;i=i-1) begin
     td = AddDay(sd,-(i*7));
     wknr = GetWeekNr(td,"",maxwk);
-    OutString(cs+((13-i)*step),0,Right(td.year,2) & "/" & wknr,true);  
+    ed = AddDay(td,5);
+    OutString(cs+((13-i)*step),0,Right(ed.year,2) & "/" & wknr,true);  
   end;
   OutString(cs2+30,0,USetStr(16388),true);//delivery days
   OutString(cs2+60,0,USetStr(17124),true);//Average
