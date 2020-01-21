@@ -5,6 +5,7 @@ external inner procedure HTArtSel(string,string,var string);
 external inner procedure HTLocations(string, string, var string);
 external inner function Boolean SetInSet2(string,string);
 external inner function Integer GetWeekNr(Date,string,var LongInt);
+external inner procedure GetStockValue(string,string,var record ItemStatusVc);
 
 function val GetStockHistory(string item,string location,Date sd,Date ed,string vccode)
 begin
@@ -37,22 +38,24 @@ begin
   Date ed;
   
   ed = AddDay(sd,6);
-  scnt = GetStockHistory(item,location,sd,ed,"IVVc");
+  //scnt = GetStockHistory(item,location,sd,ed,"IVVc");
+  scnt = GetStockHistory(item,location,sd,ed,"SHVc");
+  scnt = scnt + GetStockHistory(item,location,sd,ed,"RetVc");
 
   return;
 end;
 
-function val GetReceivedQty(string item,string location,Date td)
+function val GetActualNumbers(string item,string location,var val received,var val delivered)
 begin
   val res;
   Date ed,sd;
+  record ItemStatusVc ISr;
   
-  sd = AddDay(td,-(13*7));
-  ed = CurrentDate;
-  res = GetStockHistory(item,location,sd,ed,"PUVc");
-  res = res + GetStockHistory(item,location,sd,ed,"RetPUVc");
+  GetStockValue(item,location,ISr);
+  received = ISr.OrddOut;
+  delivered = ISr.POUnOKQty;
 
-  GetReceivedQty = res;
+  GetActualNumbers = res;
   return;
 end;
 
@@ -91,6 +94,7 @@ begin
   Integer step,cs,wknr,cs2;
   record PIVc PIr;
   Date td,sd,ed;
+  val received,delivered;
 
   if (RepSpec.ArtMode==0) then begin
     inner.ArtRn(RepSpec);
@@ -156,7 +160,7 @@ begin
   OutString(3,0,USetStr(1348),true);
   OutString(4,0,USetStr(2330),true);
   sd = AddDay(CurrentDate,-(GetDateID(CurrentDate)-1));
-  for (i=12;i>=0;i=i-1) begin
+  for (i=11;i>=0;i=i-1) begin
     td = AddDay(sd,-(i*7));
     wknr = GetWeekNr(td,"",maxwk);
     ed = AddDay(td,5);
@@ -338,7 +342,7 @@ begin
       OutString(3,0,INr.MinLevel,true);
       OutString(4,0,instock,true);
       //get sales balances for period;
-      for (i=12;i>=0;i=i-1) begin
+      for (i=11;i>=0;i=i-1) begin
         td = AddDay(sd,-(i*7));
         GetSalesHistory(INr.Code,RepSpec.f5,td,scnt);
         tot = tot + scnt;
@@ -353,8 +357,9 @@ begin
         OutString(cs2+30,0,"",true);
       end;
       OutString(cs2+60,0,tot/13,true);//Average
-      OutString(cs2+90,0,GetReceivedQty(INr.Code,RepSpec.f5,sd),true);//Received
-      OutString(cs2+120,0,tot,true);//Delivered
+      GetActualNumbers(INr.Code,RepSpec.f5,received,delivered);
+      OutString(cs2+90,0,received,true);//Received
+      OutString(cs2+120,0,delivered,true);//Delivered
       EndFormat;
       qty = qty + 1;
     end;
