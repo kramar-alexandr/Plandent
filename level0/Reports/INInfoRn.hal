@@ -643,6 +643,7 @@ BEGIN
       end;
     end;
 */
+//CUST-END
     Gray_Divider(0,1);
     StartFormat(15);
     EndFormat;
