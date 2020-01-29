@@ -172,7 +172,7 @@ begin
   return;
 end;
 
-function Boolean FindItemPrice(string item,string custcode,Date td,var val price)
+function Boolean FindItemPrice(string item,string custcode,string pricelist,Date td,var val price)
 begin
   record PLVc PLr;
   Boolean res;
@@ -181,9 +181,21 @@ begin
   PLr.ArtCode = item;
   PLr.CustCode = custcode;
   if (ReadFirstMain(PLr,3,true)) then begin
-    if (PLr.DateUntil>=td) then begin
+    if (blank(PLr.DateUntil) or PLr.DateUntil>=td) then begin
       res = true;
       price = PLr.ExVatPrice;
+    end;
+  end;
+  if (!res) then begin
+    ResetLoop(PLr);
+    PLr.PLCode = pricelist;
+    PLr.ArtCode = item;
+    PLr.CustCode = "";
+    if (ReadFirstMain(PLr,3,true)) then begin
+      if (blank(PLr.DateUntil) or PLr.DateUntil>=td) then begin
+        res = true;
+        price = PLr.ExVatPrice;
+      end;
     end;
   end;
 
@@ -219,7 +231,7 @@ begin
 
     res = true;
     //Check Linked Items
-    if (FindItemPrice(item,custcode,td,tprice)) then begin
+    if (FindItemPrice(item,custcode,pricelist,td,tprice)) then begin
       pricef = true;
       price = tprice;
     end else begin
@@ -228,7 +240,7 @@ begin
         rwcnt = MatRowCnt(LIr);
         for (i=0;i<rwcnt;i=i+1) begin
           MatRowGet(LIr,i,LIrw);
-          if (FindItemPrice(LIrw.ArtCode,custcode,td,tprice)) then begin
+          if (FindItemPrice(LIrw.ArtCode,pricelist,custcode,td,tprice)) then begin
             price = tprice;
             pricef = true;
             TrHs = false;

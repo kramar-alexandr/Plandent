@@ -23,7 +23,7 @@ begin
       TrHs = false;
     end else begin
       if (blank(location) or IHr.Location==location) then begin
-        res = res + IHr.Qty;
+        res = res - IHr.Qty;
       end;
     end;
   end;
