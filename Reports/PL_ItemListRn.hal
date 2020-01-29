@@ -168,8 +168,8 @@ begin
   end;
   OutString(cs2+30,0,USetStr(16388),true);//delivery days
   OutString(cs2+60,0,USetStr(17124),true);//Average
-  OutString(cs2+90,0,USetStr(12730),true);//Received
-  OutString(cs2+120,0,USetStr(16165),true);//Delivered
+  OutString(cs2+90,0,USetStr(1100103),true);//Received
+  OutString(cs2+120,0,USetStr(1100104),true);//Delivered
   EndFormat;
   sum1 = 0;
   if (RepSpec.flags[2]==0) then begin

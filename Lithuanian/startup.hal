@@ -81,5 +81,8 @@ begin
   SString(1100101,"Item not found");
   SString(1100102,"Patikrinkite ar yra sukurtas kainos °raäas");
 
+  SString(1100103,"Pard");
+  SString(1100104,"Pirk");
+
   return;
 end;

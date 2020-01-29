@@ -14,5 +14,8 @@ begin
   SString(1100101,"Item not found");
   SString(1100102,"Price is from item card");
 
+  SString(1100103,"Received");
+  SString(1100104,"Delivered");
+
   return;
 end;
