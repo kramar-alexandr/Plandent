@@ -10,7 +10,7 @@ begin
   RepSpec.repname = "ArtRn";
   RepSpec.Media = mtScreen;
   RepSpec.f1 = INr.Code;
-  RepSpec.f5 = MSb.MainStock;
+  //RepSpec.f5 = MSb.MainStock;
   RepSpec.flags[4] = 1;
   RepSpec.ArtMode = 1;
   RunReport(RepSpec,0);
