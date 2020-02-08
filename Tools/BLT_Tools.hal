@@ -240,7 +240,7 @@ begin
         rwcnt = MatRowCnt(LIr);
         for (i=0;i<rwcnt;i=i+1) begin
           MatRowGet(LIr,i,LIrw);
-          if (FindItemPrice(LIrw.ArtCode,pricelist,custcode,td,tprice)) then begin
+          if (FindItemPrice(LIrw.ArtCode,custcode,pricelist,td,tprice)) then begin
             price = tprice;
             pricef = true;
             TrHs = false;
