@@ -318,6 +318,10 @@ BEGIN
     MatRowGet(SHr,i,SHrw);
       if (ReadFirstItem(SHrw.ArtCode,INr,true,true)) then begin
       end;
+      //CUST-BEGIN
+      tstr = ValToString(SHrw.InStock,M4UVal,SysFormatRec.thousSep,SysFormatRec.decimalPt,LangNrr.CutDecimals);
+      OUTFORMFIELD("F_INSTOCK",tstr);
+      //CUST-END
       OUTFORMFIELD("F_CUSTARTNR",SHrw.CustArtCode);
       if (HasLocalization("PRT")==false) then begin
         OUTFORMFIELD("F_BASPRIS",SHrw.BasePrice);
