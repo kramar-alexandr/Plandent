@@ -1,0 +1,63 @@
+//<halrule>server-only</halrule>
+external inner function Boolean ReadFirstItem(string,var record INVc,Boolean,Boolean);
+
+procedure RecalcTotalRecWeight(var record POVc POr)
+begin
+  val tot;
+  row POVc POrw;
+  Integer i,rwcnt;
+  record INVc INr;
+
+  rwcnt = MatRowCnt(POr);
+  for (i=0;i<rwcnt;i=i+1) begin
+    MatRowGet(POr,i,POrw);
+    if (ReadFirstItem(POrw.ArtCode,INr,true,true)) then begin
+      tot = tot + (INr.Weight*POrw.Shipd2);
+    end;
+  end;
+  POr.RecTotalWeight = tot;
+
+  return;
+end;
+
+global
+updating  function LongInt PUVcRecordUpdateAfter(var record PUVc PUr,record PUVc PU2r,LongInt stat,LongInt long4)
+begin
+  LongInt res;
+  record POVc POr,oldPOr;
+  
+  res = inner.PUVcRecordUpdateAfter(PUr,PU2r,stat,long4);
+
+  if (PUr.PONr!=-1 and PUr.OKFlag==1 and PU2r.OKFlag!=1) then begin
+    POr.SerNr = PUr.PONr;
+    if (ReadFirstMain(POr,1,true)) then begin
+      RecordCopy(oldPOr,POr);
+      RecalcTotalRecWeight(POr);
+      RecordUpdate(oldPOr,POr,false);
+    end;
+  end;
+
+  PUVcRecordUpdateAfter = res;
+  return;
+end;
+
+global
+updating  function LongInt PUVcRecordSaveAfter(var record PUVc PUr,record PUVc PU2r,LongInt stat,LongInt long4)
+begin
+  LongInt res;
+  record POVc POr,oldPOr;
+  
+  res = inner.PUVcRecordSaveAfter(PUr,PU2r,stat,long4);
+
+  if (PUr.PONr!=-1 and PUr.OKFlag==1) then begin
+    POr.SerNr = PUr.PONr;
+    if (ReadFirstMain(POr,1,true)) then begin
+      RecordCopy(oldPOr,POr);
+      RecalcTotalRecWeight(POr);
+      RecordUpdate(oldPOr,POr,false);
+    end;
+  end;
+
+  PUVcRecordSaveAfter = res;
+  return;
+end;

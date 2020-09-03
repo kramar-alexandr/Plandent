@@ -43,6 +43,11 @@ begin
   RecordAddBegin(PLVc,"PL_PLVc");
   RecordField(DateUntil,M4Date,0,0);
   EndRecordAdd;
+
+  RecordAddBegin(POVc,"POVc_Cust");
+  RecordField(TotalWeight,M4Qty,0,0);
+  RecordField(RecTotalWeight,M4Qty,0,0);
+  EndRecordAdd;
   
   return;
 end;
