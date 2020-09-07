@@ -1711,3 +1711,25 @@ begin
   end;
   EndWindow;
 end;
+
+window CreatePOVClass:1
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  real h,v,vs;
+  WindowBegin("Specify Create #Purchase Orders#",CreatePOVClass,CGMnt,RcType);
+  SetWRect(20,93,412,250);
+  v = 10; vs = 20; h = 120;
+  EditFieldTL(h,v, 150,"Item No.",M4UStr,Normal,50,f1,false,INSClass);
+  EditFieldTL(h,v+=vs, 150,"Group",M4UStr,Normal,5,f3,false,ITSClass);
+  EditFieldTL(h,v+=vs ,80,"#Supplier#",M4UStr,Normal,41,LastAcc,false,VESClass);
+  EditFieldTL(h,v+=vs, 80,"Location",   M4Code,Normal,10,FirstAcc,false,LocationSClass);
+  CheckBox(30,v+=30,0,"Order all items from the specified #Supplier#",flags[1]);
+  StaticText(48,v+=28,"Ignoring the Default Supplier Flag on the Purchase Item",false);
+  CheckBox(30,v+=6,0,"Create new Purchase Order",flags[2]);
+  CheckBox(30,v+=16,0,"Per Variety",flags[3]);
+  CheckBox(30,v+=16,0,"Include OKed Purchase Orders only",flags[7]);
+//CUST-BEGIN
+  CheckBox(30,v+=16,0,"Include not OKed Worksheets",flags[27]);
+//CUST-END
+  EndWindow;
+end;

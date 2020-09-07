@@ -222,7 +222,7 @@ BEGIN
 END;
 
 global
-function Boolean FindPOQantity2(record INVc INp,record ItemStatusVc ISp,Boolean varf,string location,record PIVc PIp,var val t1p,var val t2p,var val minlevel,val predsales,Boolean defic,Boolean checkpif,Boolean checkminpoqty,Boolean okpoonly, var val wsqty)//BPI
+function Boolean FindPOQantity2(record INVc INp,record ItemStatusVc ISp,Boolean varf,string location,record PIVc PIp,var val t1p,var val t2p,var val minlevel,val predsales,Boolean defic,Boolean checkpif,Boolean checkminpoqty,Boolean okpoonly, var val wsqty,Boolean sheetsf)//BPI
 begin
 //try to make same as FindPOQty2
   Boolean res;
@@ -235,30 +235,32 @@ begin
 	boolean TrHs,testf;//BPI
 	integer i,rwcnt;//BPI
 	
-	//BPI start
-	wsqty = 0;
-	WSr.OKFlag = 0;
-	WSr.Location = location;
-	TrHs = true;
-	while(loopkey("LocOK",WSr,2,TrHs))begin
-		testf = true;
-		if(WSr.OKFlag!=0)then begin testf = false; TrHs = false; end;
-		if(nonblank(location))then begin
-			if(WSr.Location!=location)then begin testf = false; TrHs = false; end;
-		end;
-		
-		if(testf)then begin
-			rwcnt = matrowcnt(WSr);
-			For(i=0;i<rwcnt;i=i+1) begin
-	  		matrowget(WSr,i,WSrw);
-	  		if(WSrw.ArtCode==INp.Code)then begin
-	  			wsqty = wsqty + WSrw.Quant;
-	  		end;
-			end; 
-		end;
-	end;	
-	//BPI end
-	
+  //BPI start
+  wsqty = 0;
+  if (sheetsf) then begin
+    WSr.OKFlag = 0;
+    WSr.Location = location;
+    TrHs = true;
+    while(loopkey("LocOK",WSr,2,TrHs))begin
+      testf = true;
+      if(WSr.OKFlag!=0)then begin testf = false; TrHs = false; end;
+      if(nonblank(location))then begin
+        if(WSr.Location!=location)then begin testf = false; TrHs = false; end;
+      end;
+      
+      if(testf)then begin
+        rwcnt = matrowcnt(WSr);
+        For(i=0;i<rwcnt;i=i+1) begin
+          matrowget(WSr,i,WSrw);
+          if(WSrw.ArtCode==INp.Code)then begin
+            wsqty = wsqty + WSrw.Quant;
+          end;
+        end; 
+      end;
+    end;	
+  end;
+  //BPI end
+
   BlockLoad(POb);
   minlevel = blankval;  
   FindMinLevel(minlevel,location,INp.Code,varf);
@@ -278,7 +280,7 @@ begin
   if (t1p<minlevel) then begin
     t2p = minlevel - t1p;
   end;
-  
+
   res = true;
   if (PIp.ItemCode=="") then begin
     res = false;
@@ -320,7 +322,7 @@ function Boolean FindPOQantity(record INVc INp,record ItemStatusVc ISp,Boolean v
 begin
 	val wsqty;//BPI
 	
-  FindPOQantity = FindPOQantity2(INp,ISp,varf,location,PIp,t1p,t2p,minlevel,predsales,defic,checkpif,checkminpoqty,false,wsqty);//WSQty
+  FindPOQantity = FindPOQantity2(INp,ISp,varf,location,PIp,t1p,t2p,minlevel,predsales,defic,checkpif,checkminpoqty,false,wsqty,false);//WSQty
   return;
 end;
 
@@ -329,7 +331,7 @@ begin
   record PIVc PIr;
   record ItemStatusVc ISr;
   Boolean printf,pifound;
-  val t,t1,t2,minlevel,wsqty;// Edit ************************** BPI Ukraine - KramarAlexandr - 04, 27 09 2018 y. î 13:10:33
+  val t,t1,t2,minlevel,wsqty;// Edit ************************** BPI Ukraine - KramarAlexandr - 04, 27 09 2018 y. ï¿½ 13:10:33
 
   pifound = FindPItem(INr.Code,RepSpec.FirstAcc,PIr,RepSpec.f2,RepSpec.flags[1]);
   if (pifound==false) then begin
@@ -354,7 +356,7 @@ begin
       end;
     end;
   end;
-  pifound = FindPOQantity2(INr,ISr,varf,RepSpec.FirstAcc,PIr,t1,t2,minlevel,0,true,RepSpec.flags[5]!=0,false,RepSpec.flags[7]!=0,wsqty);// Edit ************************** BPI Ukraine - KramarAlexandr - 04, 27 09 2018 y. î 13:10:26
+  pifound = FindPOQantity2(INr,ISr,varf,RepSpec.FirstAcc,PIr,t1,t2,minlevel,0,true,RepSpec.flags[5]!=0,false,RepSpec.flags[7]!=0,wsqty,false);// Edit ************************** BPI Ukraine - KramarAlexandr - 04, 27 09 2018 y. ï¿½ 13:10:26
   if ((RepSpec.flags[3]==0) or (t1<>0)) then begin
     if (RepSpec.flags[4]==1) then  begin
       if (t2==0) then begin 
@@ -381,7 +383,7 @@ begin
           OutVal(6,0,ISr.POQty,M4UVal,true);        
         end;
         OutVal(8,0,ISr.ProdOrd,M4UVal,true);
-        OutVal(9,0,wsqty,M4UVal,true);// Edit ************************** BPI Ukraine - KramarAlexandr - 04, 27 09 2018 y. î 12:26:55
+        OutVal(9,0,wsqty,M4UVal,true);// Edit ************************** BPI Ukraine - KramarAlexandr - 04, 27 09 2018 y. ï¿½ 12:26:55
         OutVal(1,0,t2,M4UVal,true);
       end else begin
         OutVal(7,0,minlevel,M4UVal,true);
@@ -888,7 +890,7 @@ begin
     SetRepCol(5,250);
     SetRepCol(6,300);
     SetRepCol(8,350);
-    SetRepCol(9,420);// Edit ************************** BPI Ukraine - KramarAlexandr - 04, 27 09 2018 y. î 12:25:40
+    SetRepCol(9,420);// Edit ************************** BPI Ukraine - KramarAlexandr - 04, 27 09 2018 y. ï¿½ 12:25:40
   end else begin
     SetRepCol(7,235);
     SetRepCol(3,300);
@@ -905,7 +907,7 @@ begin
     OutString(5,0,USetStr(2348),true);
     OutString(6,0,USetStr(2347),true);
     OutString(8,0,USetStr(11770),true);
-    OutString(9,0,USetStr(11762),true);// Edit ************************** BPI Ukraine - KramarAlexandr - 04, 27 09 2018 y. î 12:22:27
+    OutString(9,0,USetStr(11762),true);// Edit ************************** BPI Ukraine - KramarAlexandr - 04, 27 09 2018 y. ï¿½ 12:22:27
     OutString(1,0,USetStr(2341),true);
   end else begin
     OutString(7,0,USetStr(5579),true);

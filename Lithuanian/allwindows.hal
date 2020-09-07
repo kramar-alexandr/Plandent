@@ -261,6 +261,9 @@ begin
   CheckBox(30,v+=6,0,"Sukurti naujus pirk. Užsakymus",flags[2]);
   CheckBox(30,v+=16,0,"Pagal įvairoves",flags[3]);
   CheckBox(30,v+=16,0,"Įtraukti tik patvirtintus PU",flags[7]);
+//CUST-BEGIN
+  CheckBox(30,v+=16,0,"Include not OKed Worksheets",flags[27]);
+//CUST-END
   ButtonFrame(30,v+=36,123,2,"Rūšiavimas");// Edit ************************** BPI Ukraine - KramarAlexandr - Wednesday, 22 August 2018 15:16:55
   RadioButton(30,v,0,0,"Tiekėjo prekės kodas",flags[4]);
   RadioButton(30,v+=16,1,0,"Prekės kodas",flags[4]);

@@ -14,7 +14,7 @@ external procedure ExtractObj(string,var Integer,var string);
 external function string 255 FindINObjects(string,string);
 external procedure GetINPurchaseControlAcc(record INVc,var string,string,string,Integer);
 external function Boolean FindPItem(string,string,var record PIVc,string,Integer);
-external function Boolean FindPOQantity2(record INVc,record ItemStatusVc,Boolean,string,record PIVc,var val,var val,var val,val,Boolean,Boolean,Boolean,Boolean,var val);//BPI
+external function Boolean FindPOQantity2(record INVc,record ItemStatusVc,Boolean,string,record PIVc,var val,var val,var val,val,Boolean,Boolean,Boolean,Boolean,var val,Boolean);//BPI
 external function Integer ValidatePORecord(var record POVc,record POVc,LongInt,LongInt,Boolean,var string);
 external procedure CheckFlush(var Integer,Integer);
 external function val DivRateToBase1(string,val,val,val,val,val,val,roundmode);
@@ -1069,7 +1069,7 @@ begin
     pifound = DoFindPItem(itemcode,"",PIr,RepSpec.LastAcc,matchve,RepSpec.flags[1]);
   end;
   if (pifound) then begin
-    pifound = FindPOQantity2(INr,ISr,true,RepSpec.FirstAcc,PIr,t1,t2,minlevel,0,true,true,true,RepSpec.flags[7],wsqty);//BPI
+    pifound = FindPOQantity2(INr,ISr,true,RepSpec.FirstAcc,PIr,t1,t2,minlevel,0,true,true,true,RepSpec.flags[7],wsqty,RepSpec.flags[27]==1);//BPI
   end;   
   if (t2>0 or RepSpec.flags[2]!=0) then begin
     if (pifound) then begin
@@ -1418,7 +1418,7 @@ BEGIN
       if (RepSpec.flags[3]==0) then begin
         pifound = DoFindPItem(INr.Code,RepSpec.FirstAcc,PIr,RepSpec.LastAcc,matchve,RepSpec.flags[1]);
         if (pifound) then begin
-          pifound = FindPOQantity2(INr,ISr,false,RepSpec.FirstAcc,PIr,t1,t2,minlevel,0,false,true,true,RepSpec.flags[7],wsqty);// Edit ************************** BPI Ukraine - KramarAlexandr - Wednesday, 22 August 2018 15:41:49
+          pifound = FindPOQantity2(INr,ISr,false,RepSpec.FirstAcc,PIr,t1,t2,minlevel,0,false,true,true,RepSpec.flags[7],wsqty,RepSpec.flags[27]==1);// Edit ************************** BPI Ukraine - KramarAlexandr - Wednesday, 22 August 2018 15:41:49
         end;   
 //        if (t2>0 or RepSpec.flags[2]!=0) then begin  //why creating New PO should ignore deficiency ?
         if (t2>0) then begin
@@ -1433,7 +1433,7 @@ BEGIN
         end else begin      
           pifound = DoFindPItem(INr.Code,RepSpec.FirstAcc,PIr,RepSpec.LastAcc,matchve,RepSpec.flags[1]);
           if (pifound) then begin
-            pifound = FindPOQantity2(INr,ISr,false,RepSpec.FirstAcc,PIr,t1,t2,minlevel,0,false,true,true,RepSpec.flags[7],wsqty);// Edit ************************** BPI Ukraine - KramarAlexandr - Wednesday, 22 August 2018 15:41:48
+            pifound = FindPOQantity2(INr,ISr,false,RepSpec.FirstAcc,PIr,t1,t2,minlevel,0,false,true,true,RepSpec.flags[7],wsqty,RepSpec.flags[27]==1);// Edit ************************** BPI Ukraine - KramarAlexandr - Wednesday, 22 August 2018 15:41:48
           end;   
 //          if (t2>0 or RepSpec.flags[2]!=0) then begin  //why creating New PO should ignore deficiency ?
           if (t2>0) then begin
