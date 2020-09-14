@@ -56,7 +56,7 @@ external function Boolean HasRetGoodsToSupp();
 external function string 255 VATZoneNameLIT();
 external function string 255 VATZoneEditFieldLabel_LIT(Integer);
 
-SetLangMode(LangLithuanian,"LIT",0);
+SetLangMode(LangLithuanian,"LIT",2);
 
 window IVMailTClass:1
   wtag("language","LIT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
