@@ -32,6 +32,7 @@ external procedure GetFullCurncyRate (var string,Date,var val,var val,var val,va
 external procedure FindStockValue(string,string,var record ItemStatusVc);
 external procedure RoundRowSum(string,string,string,var val);
 
+//CUST-BEGIN
 procedure SortPOByVECode(var record POVc POr)// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 23 August 2018 11:33:17
 begin
 	row POVc POrw,PO2rw;
@@ -55,6 +56,27 @@ begin
 
 return;
 end;
+
+procedure RecalcTotalWeight(var record POVc POr)
+begin
+  row POVc POrw;
+  Integer i,rwcnt;
+  val tot;
+  record INVc INr;
+  
+  rwcnt = MatRowCnt(POr);
+  for (i=0;i<rwcnt;i=i+1) begin
+    MatRowGet(POr,i,POrw);
+    if (ReadFirstItem(POrw.ArtCode,INr,true,true)) then begin
+      tot = tot + (INr.Weight*POrw.Quant);
+    end;
+  end;
+  POr.TotalWeight = tot;
+
+  return;
+end;
+
+//CUST-END
 
 function Boolean DoFindPItem(string itemcode,string location,var record PIVc PIr,string veselect,Integer matchve,Integer flags1)
 begin
@@ -286,6 +308,9 @@ BEGIN
     PackRowFieldMatrix(POrw,"TaxMatrix",TMr);  
   end;
   MatRowPut(POp,rwcnt,POrw);
+//CUST-BEGIN
+  RecalcTotalWeight(POp);
+//CUST-END
   PODchrsum(POp,rwcnt);
   RETURN;
 END;
