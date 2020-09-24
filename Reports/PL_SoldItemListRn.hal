@@ -1,0 +1,146 @@
+external inner function Boolean ReadFirstItem(string,var record INVc,Boolean,Boolean);
+
+
+procedure AddInvoiceRowToArray(record IVVc IVr,row IVVc IVrw,record INVc INr,var record ORVc ORr)
+begin
+  row ORVc ORrw;  
+
+  ClearRow(ORr,ORrw,1);
+  ORrw.ArtCode = IVrw.ArtCode;
+  ORrw.SalesAcc = IVr.SalesMan;
+  ORrw.SerialNr = IVr.Addr0;
+  ORrw.ShipNote = IVr.ShipAddr3;
+  ORrw.DespatchRowTime = IVr.ShipAddr2;
+  ORrw.VARList = INr.AlternativeCode;
+  ORrw.Spec = IVrw.Spec;
+  ORrw.PickingDate = IVr.InvDate;
+  ORrw.GroupOrdRow = IVr.SerNr;
+  ORrw.Quant = IVrw.Quant;
+  ORrw.UnitCode = IVrw.UnitCode;
+  ORrw.Price = IVrw.Price;
+  ORrw.BasePrice = IVrw.BasePrice;
+  ORrw.UnitComment = DateToString(IVr.InvDate,"YYYY-MM-DD");
+  ORrw.CustArtCode = IVr.CustCode;
+  MatRowPut(ORr,MatRowCnt(ORr),ORrw);
+
+  return;
+end;
+
+global
+procedure PL_SoldItemListRn(record RcVc RepSpec)
+begin
+  Boolean testf,TrHs;
+  record IVVc IVr;
+  row IVVc IVrw;
+  Integer i,rwcnt;
+  record ORVc ORr;
+  row ORVc ORrw;
+  array Integer p;
+  Integer v;
+  record INVc INr;
+
+  StartReportJob(USetStr(1100110));
+  
+  EndHeader;
+  
+  v = 50;
+  p[1] = v; v = v + 50;
+  p[2] = v; v = v + 130;
+  p[3] = v; v = v + 80;
+  p[4] = v; v = v + 80;
+  p[5] = v; v = v + 80;
+  p[6] = v; v = v + 80;
+  p[7] = v; v = v + 80;
+  p[8] = v; v = v + 100;
+  p[9] = v; v = v + 60;
+  p[10] = v; v = v + 80;
+  p[11] = v; v = v + 80;
+  p[12] = v; 
+  
+  StartFormat(15);
+  OutString(0,0,USetStr(1100111),false);
+  OutString(p[1],0,USetStr(1100112),false);
+  OutString(p[2],0,USetStr(1100113),false);
+  OutString(p[3],0,USetStr(1100114),false);
+  OutString(p[4],0,USetStr(1100115),false);
+  OutString(p[5],0,USetStr(1100116),false);
+  OutString(p[6],0,USetStr(1100117),false);
+  OutString(p[7],0,USetStr(1100118),false);
+  OutString(p[8],0,USetStr(1100119),false);
+  OutString(p[9],0,USetStr(1100120),true);
+  OutString(p[10],0,USetStr(1100121),false);
+  OutString(p[11],0,USetStr(1100122),true);
+  OutString(p[12],0,USetStr(1100123),true);  
+  EndFormat;
+  StartFormat(1);
+  Gray_divider(0,p[12]);
+  EndFormat;
+
+  TrHs = true;
+  IVr.InvDate = RepSpec.sStartDate;
+  while (LoopKey("InvDate",IVr,1,TrHs)) begin
+    if (IVr.InvDate>RepSpec.sEndDate) then begin
+      TrHs = false;
+    end else begin
+      testf = true;
+      if (nonblank(RepSpec.f1) and RepSpec.f1!=IVr.SalesMan) then begin
+        testf = false;
+      end;
+      if (RepSpec.flags[3]==0 and IVr.OKFlag==1) then begin
+        testf = false;
+      end;
+      if (RepSpec.flags[4]==0 and IVr.OKFlag==0) then begin
+        testf = false;
+      end;
+      
+      if (testf) then begin
+        rwcnt = MatRowCnt(IVr);
+        for (i=0;i<rwcnt;i=i+1) begin
+          MatRowGet(IVr,i,IVrw);
+          testf = false;
+          ReadFirstItem(IVrw.ArtCode,INr,true,true);
+          if (blank(RepSpec.f2) or RepSpec.f2==INr.Group) then begin
+            testf = true;
+            i = rwcnt;
+          end;
+          if (blank(RepSpec.f3) or SetInSet(RepSpec.f2,INr.DispGroups)) then begin
+            testf = true;
+          end;
+          if (testf) then begin
+            AddInvoiceRowToArray(IVr,IVrw,INr,ORr);
+          end;
+        end;
+      end;
+    end;
+  end;
+  
+  switch (RepSpec.ArtMode) begin
+    case 0:
+      SortRows(ORr,"ArtCode",true);
+    case 1:
+      SortRows(ORr,"UnitComment",true);
+  end;
+  
+  rwcnt = MatRowCnt(ORr);
+  for (i=0;i<rwcnt;i=i+1) begin
+    MatRowGet(ORr,i,ORrw);
+    StartFormat(15);
+    OutString(0,"DblINVc",ORrw.ArtCode,false);
+    OutString(p[1],0,ORrw.SalesAcc,false);
+    OutStringID(p[2],"DblCUVc",ORrw.SerialNr,false,ORrw.CustArtCode);
+    OutString(p[3],0,ORrw.ShipNote,false);
+    OutString(p[4],0,ORrw.DespatchRowTime,false);
+    OutString(p[5],0,ORrw.VARList,false);
+    OutString(p[6],0,ORrw.Spec,false);
+    OutString(p[7],0,ORrw.PickingDate,false);
+    OutString(p[8],"DblIVVc",ORrw.GroupOrdRow,false);
+    OutString(p[9],0,ORrw.Quant,true);
+    OutString(p[10],0,ORrw.UnitCode,false);
+    OutString(p[11],0,ORrw.Price,true);
+    OutString(p[12],0,ORrw.BasePrice,true);  
+    EndFormat;
+  end;
+  EndJob;
+
+  return;
+end;

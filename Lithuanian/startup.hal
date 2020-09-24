@@ -2,13 +2,13 @@ event startup
 begin
   Real h,v,l,vs;
 
-  SetLangMode(LangLithuanian,"LIT",0);
+  SetLangMode(LangLithuanian,"LIT",2);
   
 	Setting("Atnaujinti Kainas",BLT_UpdatePIPriceLClass,modPO);// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 23 August 2018 13:25:14
 	Setting("Update Item Minimum Levels",INMinLevelUpdateWClass,modIN);	
 
 	Setting("Linked Items",PL_LinkedItemLClass,modSO);
-	Setting("Kain÷ °raä÷ persp˜jimas",PL_PriceNotifTClass,modSO);
+	Setting("KainÅ³ Ä¯raÅ¡Å³ perspÄ—jimas",PL_PriceNotifTClass,modSO);
 
 	//Import("Planedent - SwedBank import Statement",SwedBankImportSTIClass,SwedBankImportSTIn,modSL);// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 23 August 2018 14:22:06
   Import("Planedent - SEB Bank import Statement",SEBBankImportSTIClass,SEBBankImportSTIn,modSL);// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 23 August 2018 14:22:10
@@ -20,13 +20,14 @@ begin
 	Setting("Planedent - SEB Bank import Statement",SEBbankImportLClass,modSL);// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 23 August 2018 14:22:19
 	//Setting("Planedent - Luminor import Statement",LuminorImportLClass,modSL);// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 23 August 2018 14:22:22
 	
+  Report("Plandent - ParduotÅ³ prekiÅ³ ataskaita",PL_SoldItemListRClass,PL_SoldItemListRn,0,modSL);
 	
 	//Copyed from Internal Stock Module ti Stock
-	RegisterWS("Atvykst. prek˜s","Atvykst. prek˜s","Nauja atvykst. prek˜",OffHireVc,modSVO);
-  RegisterWS("Iävykst. prek˜s","Iävykst. prek˜s","Nauja iävykst. prek˜",DispatchVc,modSVO); 
-	Report("Vidinio sand˜lio liku‹iai",IntINRClass,IntInvValRn,0,modSVO);
-  Report("Grˆìinam÷ preki÷ ìurnalas",GoodsINRClass,GoodsinRn,0,modSVO);
-  Report("Iäduodam÷ preki÷ ìurnalas",GoodsOutRclass,GoodsOutRn,0,modSVO);
+	RegisterWS("Atvykst. prekÄ—s","Atvykst. prekÄ—s","Nauja atvykst. prekÄ—",OffHireVc,modSVO);
+  RegisterWS("IÅ¡vykst. prekÄ—s","IÅ¡vykst. prekÄ—s","Nauja iÅ¡vykst. prekÄ—",DispatchVc,modSVO); 
+	Report("Vidinio sandÄ—lio likuÄiai",IntINRClass,IntInvValRn,0,modSVO);
+  Report("GrÄ…Å¾inamÅ³ prekiÅ³ Å¾urnalas",GoodsINRClass,GoodsinRn,0,modSVO);
+  Report("IÅ¡duodamÅ³ prekiÅ³ Å¾urnalas",GoodsOutRclass,GoodsOutRn,0,modSVO);
 	
   /* Lithuania Instrastat Export */
   StrSetBegin(631);
@@ -35,10 +36,10 @@ begin
   StrSetText(M,"Revising");
   EndStrSet;
 
-  SString(1000001,"Rğäiavimo klas˜s tipas turi bğti nurodytas!");
+  SString(1000001,"RÅ«Å¡iavimo klasÄ—s tipas turi bÅ«ti nurodytas!");
 
-  SString(1000002,"Gamintojo prek˜s kodas");
-	SString(1000003,"Prek˜s vnt.");
+  SString(1000002,"Gamintojo prekÄ—s kodas");
+	SString(1000003,"PrekÄ—s vnt.");
 	SString(1000004,"Gamintojas");
 	
   SString(1100005,"To pos.");
@@ -63,11 +64,11 @@ begin
 
   SString(1100021,"Import folder not specified, please check EDI settings");
   SString(1100022,"Import had errors, please check import error register");
-  SString(1100023,"Kieki÷ palyginimas");
+  SString(1100023,"KiekiÅ³ palyginimas");
   SString(1100024,"Patv. kiekis");
-  SString(1100025,"Mğs÷ kiekis");
-  SString(1100026,"Best before date doesnÕt meet customersÕ minimum requirements");
-  SString(1100027,"Nurodykite kainˆ");
+  SString(1100025,"MÅ«sÅ³ kiekis");
+  SString(1100026,"Best before date doesnâ€™t meet customersâ€™ minimum requirements");
+  SString(1100027,"Nurodykite kainÄ…");
   SString(1100028,"Price update finished");
   SString(1100029,"Date must be within period");
 
@@ -75,14 +76,31 @@ begin
   SString(1100031,"Akcija iki");
   SString(1100032,"Akc. kaina");
   SString(1100033,"Minimal best berfore days must be greater or equal to zero");
-  SString(1100034,"Best before date doesnÕt meet minimum requirements");
+  SString(1100034,"Best before date doesnâ€™t meet minimum requirements");
 
   SString(1100100,"Item Minimums Updated Successfully");
   SString(1100101,"Item not found");
-  SString(1100102,"Patikrinkite ar yra sukurtas kainos °raäas");
+  SString(1100102,"Patikrinkite ar yra sukurtas kainos Ä¯raÅ¡as");
 
   SString(1100103,"Pard");
   SString(1100104,"Pirk");
+
+/*SoldItemListRn*/
+
+  SString(1100110,"Sold Items");
+  SString(1100111,"Item");
+  SString(1100112,"Salesman");
+  SString(1100113,"Customer Name");
+  SString(1100114,"Del. city");
+  SString(1100115,"Post. Code");
+  SString(1100116,"Alt. Code");
+  SString(1100117,"Item Desc.");
+  SString(1100118,"Inv. Date");
+  SString(1100119,"Inv. No.");
+  SString(1100120,"Qty");
+  SString(1100121,"Unit");
+  SString(1100122,"Unit Price");
+  SString(1100123,"Cost Price");
 
   return;
 end;

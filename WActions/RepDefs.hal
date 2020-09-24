@@ -14,3 +14,21 @@ BEGIN
   SelectWindow(wn);
   RETURN;
 END;
+
+
+global
+procedure PL_SoldItemListRClassReportDefaults(Integer wn)
+BEGIN
+  record RcVc RepSpec;
+  
+  DeselectWindow(wn,false);
+  GetWindowRecord(wn,RepSpec);
+  ReportDefaults(RepSpec,"PL_SoldItemListRClass");
+  RepSpec.flags[3] = 1;
+  RepSpec.flags[4] = 1;
+  RepSpec.Scaling = 0;
+  RepSpec.BaseWidth = 1000;
+  PutWindowRecord(wn,RepSpec);
+  SelectWindow(wn);
+  RETURN;
+END;

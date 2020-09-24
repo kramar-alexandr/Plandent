@@ -9,6 +9,7 @@ begin
 	Setting("Linked Items",PL_LinkedItemLClass,modSO);
 	Setting("Price Records Alerts",PL_PriceNotifTClass,modSO);
 
+  Report("Plandent - Sold Items",PL_SoldItemListRClass,PL_SoldItemListRn,0,modSL);
 
   SString(1100100,"Item Minimums Updated Successfully");
   SString(1100101,"Item not found");
@@ -16,6 +17,24 @@ begin
 
   SString(1100103,"Received");
   SString(1100104,"Delivered");
+
+
+/*SoldItemListRn*/
+
+  SString(1100110,"Sold Items");
+  SString(1100111,"Item");
+  SString(1100112,"Salesman");
+  SString(1100113,"Customer Name");
+  SString(1100114,"Del. city");
+  SString(1100115,"Post. Code");
+  SString(1100116,"Alt. Code");
+  SString(1100117,"Item Desc.");
+  SString(1100118,"Inv. Date");
+  SString(1100119,"Inv. No.");
+  SString(1100120,"Qty");
+  SString(1100121,"Unit");
+  SString(1100122,"Unit Price");
+  SString(1100123,"Cost Price");
 
   return;
 end;

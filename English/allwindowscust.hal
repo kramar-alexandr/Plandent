@@ -84,3 +84,24 @@ begin
   EndWindow;
 end;
 
+window PL_SoldItemListRClass:1
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  real h,h2,v,vm,vs;
+  WindowBegin("Specify Sold Items",PL_SoldItemListRClass,CGRcW,RcType);
+  SetWRect(20,80,415,310);
+  v = 6; vs = 20; h = 120;
+  PeriodField(h,v,"Period");
+  EditFieldTL(h,v+=vs, 150,"Salesman",   M4Code,Normal,50,f1,false,UserSClass);
+  EditFieldTL(h,v+=vs, 150,"Item Group",   M4UStr,Normal,11,f3,false,ITSClass);
+  EditFieldTL(h,v+=vs, 150,"Item Classifications", M4UStr,Normal,60,f4,false,DISClass);
+  ButtonFrame(h,v+=41,123,2,"Sorted by");
+  RadioButton(h,v,0,0,"Item",ArtMode);
+  RadioButton(h,v+=16,1,0,"Invoice Date",ArtMode);
+
+  ButtonFrame(h,v+=40,123,3,"Status");
+  CheckBox(h,v,0,"OKed",flags[3]);
+  CheckBox(h,v+=16,0,"Not OKed",flags[4]);
+  EndFrame;
+  EndWindow;
+end;
