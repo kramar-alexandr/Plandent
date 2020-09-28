@@ -237,6 +237,9 @@ LAddPORow:;
     MatRowPut(POp,i,POrw);
     i = i + 1;
   end;
+//CUST-BEGIN
+  RecalcTotalWeight(POp);
+//CUST-END
   RETURN;
 END;
 
