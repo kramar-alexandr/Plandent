@@ -93,8 +93,8 @@ begin
   v = 6; vs = 20; h = 120;
   PeriodField(h,v,"Period");
   EditFieldTL(h,v+=vs, 150,"Salesman",   M4Code,Normal,50,f1,false,UserSClass);
-  EditFieldTL(h,v+=vs, 150,"Item Group",   M4UStr,Normal,11,f3,false,ITSClass);
-  EditFieldTL(h,v+=vs, 150,"Item Classifications", M4UStr,Normal,60,f4,false,DISClass);
+  EditFieldTL(h,v+=vs, 150,"Item Group",   M4UStr,Normal,11,f2,false,ITSClass);
+  EditFieldTL(h,v+=vs, 150,"Item Classifications", M4UStr,Normal,60,f3,false,DISClass);
   ButtonFrame(h,v+=41,123,2,"Sorted by");
   RadioButton(h,v,0,0,"Item",ArtMode);
   RadioButton(h,v+=16,1,0,"Invoice Date",ArtMode);
