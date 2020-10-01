@@ -9,8 +9,8 @@ begin
   ORrw.ArtCode = IVrw.ArtCode;
   ORrw.SalesAcc = IVr.SalesMan;
   ORrw.SerialNr = IVr.Addr0;
-  ORrw.ShipNote = IVr.ShipAddr3;
-  ORrw.DespatchRowTime = IVr.ShipAddr2;
+  ORrw.ShipNote = IVr.DelAddr3;
+  ORrw.DespatchRowTime = IVr.DelAddr4;
   ORrw.VARList = INr.AlternativeCode;
   ORrw.Spec = IVrw.Spec;
   ORrw.PickingDate = IVr.InvDate;
