@@ -15,7 +15,11 @@ begin
   ORrw.Spec = IVrw.Spec;
   ORrw.PickingDate = IVr.InvDate;
   ORrw.GroupOrdRow = IVr.SerNr;
-  ORrw.Quant = IVrw.Quant;
+  if (IVr.InvType==kInvoiceTypeCredit) then begin
+    ORrw.Quant = -IVrw.Quant;
+  end else begin
+    ORrw.Quant = IVrw.Quant;
+  end;
   ORrw.UnitCode = IVrw.UnitCode;
   ORrw.Price = IVrw.Price;
   ORrw.BasePrice = IVrw.BasePrice;
