@@ -239,13 +239,12 @@ begin
   wsqty = 0;
   if (sheetsf) then begin
     WSr.OKFlag = 0;
-    WSr.Location = location;
     TrHs = true;
-    while(loopkey("LocOK",WSr,2,TrHs))begin
+    while(loopkey("OKFlagTransDate",WSr,1,TrHs))begin
       testf = true;
       if(WSr.OKFlag!=0)then begin testf = false; TrHs = false; end;
       if(nonblank(location))then begin
-        if(WSr.Location!=location)then begin testf = false; TrHs = false; end;
+        if(WSr.Location!=location)then begin testf = false; end;
       end;
       
       if(testf)then begin
