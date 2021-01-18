@@ -1733,3 +1733,18 @@ begin
 //CUST-END
   EndWindow;
 end;
+
+window ConvCustTClass:1
+  wtag("language","ENG"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+begin
+  WindowBegin("Conversions - Contacts",ConvCustTClass,CGHbl,HBlRecType);
+  SetBlid(ConvCustBlock);
+  SetWRect(64,80,509,298);
+  Sizeable(-1,-1,-1,0);
+  MatrixBegin(4,27,-21,-20,ConvCustRowType,6999);
+  MatCol(1,32,"Old",0,OldCode,false,AllCUSClass);
+  MatCol(1,186,"New",0,NewCode,false,0);
+  EndMatrix;
+  EndWindow;
+end;
+
