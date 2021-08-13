@@ -103,4 +103,16 @@ BEGIN
 return;
 end;
 
+global
+updating function LongInt IVVcRecordCheck(record IVVc IVp,record IVVc IV2p,LongInt stat,LongInt long4)
+begin
+  LongInt res;
+  
+  IVp.NoEInvoice = 1;
+  res = inner.IVVcRecordCheck(IVp,IV2p,stat,long4);
+  
+  IVVcRecordCheck = res;
+return;
+end;
+
 
