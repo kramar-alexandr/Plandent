@@ -14,3 +14,56 @@ begin
 
 return;
 end;
+
+global updating procedure RecalcPUMatrixMn()	//Edit **********************************************Vas-P	28/09/2021
+begin
+	record PUVc PUr;
+	record POVc POr;
+	row POVc POrw;
+	row PUVc PUrw;
+	vector integer vRow;
+	integer rwcnt,mtrw,i;
+	boolean TrHs,testf,updatef;
+	
+	
+	logtext(0,"RecalcPUMatrixMn start");
+	// POr.SerNr = "109";
+	// if(readfirstmain(POr,1,true))then begin
+	POr.SerNr = "";
+	while(loopmain(POr,1,true))begin
+		ClearVector(vRow);
+		rwcnt = matrowcnt(POr);
+		for(i=0;i<rwcnt;i=i+1)begin
+			matrowget(POr,i,POrw);
+			vRow[POrw.ArtCode] = i;
+		end;
+		
+		PUr.PONr = POr.SerNr;
+		TrHs = true;
+		while(loopkey("PONr",PUr,1,TrHs))begin
+			testf = true;
+			updatef = false;
+			if(PUr.PONr!=POr.SerNr)then begin TrHs = false; testf = false; end;
+			if(testf)then begin
+				mtrw = matrowcnt(PUr);
+				for(i=0;i<mtrw;i=i+1)begin
+					matrowget(PUr,i,PUrw);
+					if(PUrw.OrdRow!=vRow[PUrw.ArtCode])then begin
+						PUrw.OrdRow = vRow[PUrw.ArtCode];
+						updatef = true;
+						matrowput(PUr,i,PUrw);
+						logtext(0,"PUrw.ArtCode / i - " & PUrw.ArtCode & " / " & i);
+					end;
+				end;
+				if(updatef)then begin
+					RecordStore(PUr,true);
+				end;
+			end;
+		end;
+		ResetLoop(PUr);
+	end;
+	
+	logtext(0,"RecalcPUMatrixMn end");
+	
+return;
+end;

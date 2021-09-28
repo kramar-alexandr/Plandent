@@ -8,6 +8,7 @@ begin
 
 	Setting("Linked Items",PL_LinkedItemLClass,modSO);
 	Setting("Price Records Alerts",PL_PriceNotifTClass,modSO);
+  Maintenance("Recalc POrow in PU",MyVClass,RecalcPUMatrixMn,modDBMain);// Edit ************************** BPI Ukraine - KramarAlexandr - 02, 28 09 2021 y. at 3:48:40 PM
 
   Report("Plandent - Sold Items",PL_SoldItemListRClass,PL_SoldItemListRn,0,modSL);
 
