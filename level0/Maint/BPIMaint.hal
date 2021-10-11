@@ -1,3 +1,6 @@
+external procedure ExtractObj(string,var Integer,var string);
+external function Boolean ReadFirstItem(string,var record INVc,Boolean,Boolean);
+
 global updating procedure DelPINMn(record RcVc RepSpec)
 begin
 	record PIVc PIr;
@@ -21,9 +24,13 @@ begin
 	record POVc POr;
 	row POVc POrw;
 	row PUVc PUrw;
-	vector integer vRow;
-	integer rwcnt,mtrw,i;
-	boolean TrHs,testf,updatef;
+	vector integer vRow,vRowCnt,vpos;
+	integer rwcnt,mtrw,i,pos,j;
+	boolean TrHs,testf,updatef,chect;
+	vector string 100 vRowCnts;
+	string 100 istr;
+	record INVc INr;
+	
 	
 	
 	logtext(0,"RecalcPUMatrixMn start");
@@ -32,10 +39,22 @@ begin
 	POr.SerNr = "";
 	while(loopmain(POr,1,true))begin
 		ClearVector(vRow);
+		ClearVector(vRowCnt);
+		ClearVector(vpos);
+		ClearVector(vRowCnts);
 		rwcnt = matrowcnt(POr);
 		for(i=0;i<rwcnt;i=i+1)begin
 			matrowget(POr,i,POrw);
+			ReadFirstItem(POrw.ArtCode,INr,false,false);
 			vRow[POrw.ArtCode] = i;
+      vRowCnt[POrw.ArtCode] = vRowCnt[POrw.ArtCode] + 1;
+			if(INr.SerNrf!=1)then begin  
+        vRowCnts[POrw.ArtCode] = vRowCnts[POrw.ArtCode] & i & ",";
+			end else begin
+			  for(j=0;j<POrw.Quant;j=j+1)begin
+			    vRowCnts[POrw.ArtCode] = vRowCnts[POrw.ArtCode] & i & ",";
+			  end;
+			end;
 		end;
 		
 		PUr.PONr = POr.SerNr;
@@ -48,11 +67,25 @@ begin
 				mtrw = matrowcnt(PUr);
 				for(i=0;i<mtrw;i=i+1)begin
 					matrowget(PUr,i,PUrw);
-					if(PUrw.OrdRow!=vRow[PUrw.ArtCode])then begin
-						PUrw.OrdRow = vRow[PUrw.ArtCode];
-						updatef = true;
-						matrowput(PUr,i,PUrw);
-						logtext(0,"PUrw.ArtCode / i - " & PUrw.ArtCode & " / " & i);
+					if(vRowCnt[PUrw.ArtCode]<2)then begin
+            if(PUrw.OrdRow!=vRow[PUrw.ArtCode])then begin
+              PUrw.OrdRow = vRow[PUrw.ArtCode];
+              updatef = true;
+              matrowput(PUr,i,PUrw);
+              logtext(0,POr.SerNr & " PUrw.ArtCode / i - " & PUrw.ArtCode & " / " & i);
+            end;
+					end else begin
+					  pos = vpos[PUrw.ArtCode];
+					  ExtractObj(vRowCnts[PUrw.ArtCode],pos,istr);
+					  vpos[PUrw.ArtCode] = pos;
+            if(nonblank(istr))then begin
+              if(PUrw.OrdRow!=stringtoint(istr))then begin
+                PUrw.OrdRow = stringtoint(istr);
+                updatef = true;
+                matrowput(PUr,i,PUrw);
+                logtext(0,POr.SerNr & " PUrw.ArtCode / i - " & PUrw.ArtCode & " / " & i);
+              end;
+            end;
 					end;
 				end;
 				if(updatef)then begin
@@ -62,6 +95,25 @@ begin
 		end;
 		ResetLoop(PUr);
 	end;
+	
+	resetloop(POr);
+	POr.SerNr = "";
+	while(loopmain(POr,1,true))begin
+	  rwcnt = matrowcnt(POr);
+    chect = false;
+		for(i=0;i<rwcnt;i=i+1)begin
+			matrowget(POr,i,POrw);
+			if(POrw.Invd>POrw.Shipd1)then begin
+			  chect = true;
+			end;
+		end;
+	  
+	  if(chect)then begin
+	    logtext(0,"Need check PO " & POr.SerNr);
+	  end;
+	  
+	end;
+	
 	
 	logtext(0,"RecalcPUMatrixMn end");
 	
