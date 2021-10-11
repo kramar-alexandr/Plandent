@@ -18,6 +18,64 @@ begin
 return;
 end;
 
+global updating procedure RecalcPUMatrixExtraMn()
+begin
+  record PUVc PUr;
+	record POVc POr;
+	row POVc POrw;
+	row PUVc PUrw;
+	vector integer vRow,vRowCnt,vpos;
+	integer rwcnt,mtrw,i,pos,j;
+	boolean TrHs,testf,updatef,chect;
+	vector string 100 vRowCnts;
+	string 100 istr;
+	record INVc INr;
+	
+	PUr.PONr = -1;
+	TrHs = true;
+	while(loopkey("PONr",PUr,1,TrHs))begin
+	  if(PUr.PONr!=-1)then begin TrHs = false; end;
+	  
+	  if(TrHs)then begin
+	    rwcnt = matrowcnt(PUr);
+	    for(i=0;i<rwcnt;i=i+1)begin
+	      matrowget(PUr,i,PUrw);
+	      if(PUrw.PONr>-1)then begin
+	        POr.SerNr = PUrw.PONr;
+	        if(readfirstmain(POr,1,true))then begin
+	          updatef = false;
+	          if(PUrw.OrdRow<matrowcnt(POr))then begin
+	            matrowget(POr,PUrw.OrdRow,POrw);
+	            if(POrw.ArtCode==PUrw.ArtCode)then begin
+                if((POrw.Shipd1+PUrw.Quant)<=POrw.Quant)then begin
+                  logtext(0,PUrw.ArtCode & " Need to add to " & PUrw.Quant);
+                  if(PUr.OKFlag==0)then begin
+                    POrw.Shipd1 = POrw.Shipd1 + PUrw.Quant;
+                  end else begin
+                    POrw.Shipd1 = POrw.Shipd1 + PUrw.Quant;
+                    POrw.Shipd2 = POrw.Shipd2 + PUrw.Quant;
+                  end;
+	                logtext(0," Extra val " & PUr.SerNr);
+	                matrowput(POr,PUrw.OrdRow,POrw);
+	                updatef = true;
+	              end;
+	            end else begin
+	              logtext(0,PUrw.ArtCode & " Item Not Found " & PUrw.Quant & " ===  " & PUr.SerNr);
+	            end;
+	            if(updatef)then begin
+	              recordstore(POr,true);
+	            end;
+	          end;
+	        end;
+	      end;
+	    end;
+	  end;
+	end;
+
+return;
+end;
+
+
 global updating procedure RecalcPUMatrixMn()	//Edit **********************************************Vas-P	28/09/2021
 begin
 	record PUVc PUr;
