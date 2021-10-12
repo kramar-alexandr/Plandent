@@ -177,3 +177,40 @@ begin
 	
 return;
 end;
+
+
+global webpublic procedure WebFindPO()
+begin
+  record PUVc PUr;
+	record POVc POr;
+	row POVc POrw;
+	row PUVc PUrw;
+	vector integer vRow,vRowCnt,vpos;
+	integer rwcnt,mtrw,i,pos,j;
+	boolean TrHs,testf,updatef,chect;
+	vector string 100 vRowCnts;
+	string 100 istr;
+	record INVc INr;
+	
+	istr = webgetarg("item");
+	
+	weboutstring(istr & "<BR>");
+	while(loopmain(POr,1,true))begin
+	  rwcnt = matrowcnt(POr);
+	  for(i=0;i<rwcnt;i=i+1)begin
+	    matrowget(POr,i,POrw);
+	    
+	    if(POrw.ArtCode==istr)then begin
+	      weboutstring(".." & POr.SerNr & " " & POrw.Quant & "<BR>");
+	      if(POrw.Shipd2!=POrw.Quant or POrw.Shipd1!=POrw.Quant)then begin
+	        weboutstring("=======>>>" & POr.SerNr & " " & POrw.Quant);
+	        weboutstring("<BR>");
+	      end;
+	    end;
+	  
+	  end;
+	
+	end;
+
+return;
+end;
