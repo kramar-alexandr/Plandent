@@ -1,5 +1,7 @@
 remote procedure BLT_UpdatePIPriceVc_PasteVECode(var record BLT_UpdatePIPriceVc);
 remote updating procedure BLT_RunUpdatePIPrices(record BLT_UpdatePIPriceVc);
+remote procedure BLT_UpdateBasePIPriceVc_PasteVECode(var record BLT_UpdatePIPriceVc);
+remote updating procedure BLT_RunUpdateBasePIPrices(record BLT_UpdatePIPriceVc);
 
 function boolean BLT_UpdatePIPriceDClassVECodeEFAfter(integer wn, integer changed)
 begin
@@ -57,5 +59,66 @@ begin
   MessageBox(1100028,"");
 
 LBLT_UpdatePricessm:;
+  return;
+end;
+
+
+
+function boolean BLT_UpdateBasePIPriceDClassVECodeEFAfter(integer wn, integer changed)
+begin
+  record BLT_UpdateBasePIPriceVc BLT_UpdateBasePIPricer;
+  boolean res;
+
+  if changed != 0 then begin
+    GetWindowRecord(wn,BLT_UpdateBasePIPricer);
+    BLT_UpdateBasePIPriceVc_PasteVECode(BLT_UpdateBasePIPricer);
+    PutWindowRecord(wn,BLT_UpdateBasePIPricer);
+  end;
+
+  BLT_UpdateBasePIPriceDClassVECodeEFAfter = res;
+  return;
+end;
+
+global
+function Boolean BLT_UpdateBasePIPriceDClassAfterEditField(Integer wn,string fieldname,Integer fn, Integer rownr,Integer changed)
+BEGIN
+  Boolean res;
+
+  switch (fieldname) begin
+    case "VECode": res = BLT_UpdateBasePIPriceDClassVECodeEFAfter(wn,changed);
+  end;
+
+  BLT_UpdateBasePIPriceDClassAfterEditField = res;
+  RETURN;
+END;
+
+global
+updating procedure BLT_UpdateBasePricessm()
+begin
+  record BLT_UpdateBasePIPriceVc BLT_UpdateBasePIPricer;
+  row BLT_UpdateBasePIPriceVc BLT_UpdateBasePIPricerw;
+  integer wn,i,rwc;
+
+  wn = CurWindow;
+  DeselectWindow(wn,true);
+  GetWindowRecord(wn,BLT_UpdateBasePIPricer);
+
+  // Check if all prices are specified
+  rwc = MatRowCnt(BLT_UpdateBasePIPricer);
+  for(i=0;i<rwc;i=i+1)begin
+    MatRowGet(BLT_UpdateBasePIPricer,i,BLT_UpdateBasePIPricerw);
+    if nonblank(BLT_UpdateBasePIPricerw.ArtCode) and blank(BLT_UpdateBasePIPricerw.NewPrice) then begin
+      MessageBox(1100027,"");
+      SelectWindow(wn);
+      WindowFieldGoto(wn,BLT_UpdateBasePIPricer,i,"NewPrice",true);
+      GoTo LBLT_UpdateBasePricessm;
+    end;
+  end;
+
+  // Update prices
+  BLT_RunUpdateBasePIPrices(BLT_UpdateBasePIPricer);
+  MessageBox(1100028,"");
+
+LBLT_UpdateBasePricessm:;
   return;
 end;

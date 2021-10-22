@@ -22,6 +22,71 @@ external inner function Boolean GetItemPriceDiscount3(string,val,var record INVc
                                                 string,Boolean,var Boolean,string,var string,var val,string,string,var string);
 
 
+
+global
+procedure BLT_UpdateBasePIPriceVc_PasteVECode(var record BLT_UpdateBasePIPriceVc BLT_UpdateBasePIPricer)
+begin
+  row BLT_UpdateBasePIPriceVc BLT_UpdateBasePIPricerw;
+  record PIVc PIr;
+  record INVc INr;
+  record CUVc VEr;
+  integer i,rwc;
+  boolean wloop;
+
+  if nonblank(BLT_UpdateBasePIPricer.VECode) then begin
+    VEr.Code = BLT_UpdateBasePIPricer.VECode;
+    ReadFirstMain(VEr,1,true);
+    BLT_UpdateBasePIPricer.VEName = VEr.Name;
+
+    PIr.VECode = BLT_UpdateBasePIPricer.VECode;
+    wloop = true;
+    While LoopKey("Vendor",PIr,1,wloop) begin
+      if PIr.VECode != BLT_UpdateBasePIPricer.VECode then begin
+        wloop = false;
+      end else begin
+        INr.Code = PIr.ItemCode;
+        ReadFirstMain(INr,1,true);
+        BLT_UpdateBasePIPricerw.ArtCode = INr.Code;// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 10 September 2018 09:48:58
+        BLT_UpdateBasePIPricerw.Spec = INr.Name;
+        BLT_UpdateBasePIPricerw.OldPrice = INr.UPrice1;
+        MatRowPut(BLT_UpdateBasePIPricer,MatRowCnt(BLT_UpdateBasePIPricer),BLT_UpdateBasePIPricerw);
+      end;
+    end;
+  end;
+
+  return;
+end;
+
+global updating
+procedure BLT_RunUpdateBasePIPrices(record BLT_UpdateBasePIPriceVc BLT_UpdateBasePIPricer)
+begin
+  row BLT_UpdateBasePIPriceVc BLT_UpdateBasePIPricerw;
+  record PIVc PIr,oldPIr;
+  integer i,rwc;
+  record INVc INr,oldINr;
+
+  rwc = MatRowCnt(BLT_UpdateBasePIPricer);
+  for(i=0;i<rwc;i=i+1)begin
+    MatRowGet(BLT_UpdateBasePIPricer,i,BLT_UpdateBasePIPricerw);
+    if nonblank(BLT_UpdateBasePIPricerw.ArtCode) then begin
+      INr.Code = BLT_UpdateBasePIPricerw.ArtCode;
+      ReadFirstMain(INr,1,true);
+      if ReadFirstMain(INr,1,true) then begin
+        if (INr.UPrice1 != BLT_UpdateBasePIPricerw.NewPrice) then begin
+          RecordCopy(oldINr,INr);
+          INr.UPrice1 = BLT_UpdateBasePIPricerw.NewPrice;
+          if RecordUpdate(oldINr,INr,true) != 0 then begin
+            LogText(0,"BLT_RunUpdateBasePIPrices ERROR :: Could not update PIVc record " & INr.Code);
+          end;
+        end;
+      end;
+    end;
+  end;
+
+  return;
+end;
+
+
 global
 procedure BLT_UpdatePIPriceVc_PasteVECode(var record BLT_UpdatePIPriceVc BLT_UpdatePIPricer)
 begin

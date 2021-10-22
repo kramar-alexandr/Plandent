@@ -5,6 +5,7 @@ begin
   SetLangMode(LangLithuanian,"LIT",2);
   
 	Setting("Atnaujinti Kainas",BLT_UpdatePIPriceLClass,modPO);// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 23 August 2018 13:25:14
+	Setting("Atnaujinti bazines kainas",BLT_UpdateBasePIPriceLClass,modPO);// Edit ************************** BPI Ukraine - KramarAlexandr - 05, 22 10 2021 y. at 1:50:22 PM
 	Setting("Update Item Minimum Levels",INMinLevelUpdateWClass,modIN);	
 
 	Setting("Linked Items",PL_LinkedItemLClass,modSO);

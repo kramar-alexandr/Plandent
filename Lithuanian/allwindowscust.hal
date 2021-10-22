@@ -36,46 +36,86 @@ begin
 end;
 
 window BLT_UpdatePIPriceDClass:1// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 23 August 2018 13:50:48
-  wtag("language","LIT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
-begin
-  real h,v,vs;
+   wtag("language","LIT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+ begin
+   real h,v,vs;
 
-  WindowBegin("Atnaujinti Kainas",BLT_UpdatePIPriceDClass,CGview,-);
-  SetWRect(20,100,630,200);
-  UseView(BLT_UpdatePIPriceVc);
-  Sizeable(-1,-1,0,0); //EBS
-  h = 120; v = 6; vs = 20;
-  EditField(h,v,160,"Nr.",ViewOnly,SerNr,false,0);
-  EditField(h,v+=vs,100,"Tiekï¿½jas",Normal,VECode,false,VESClass);
-  EditField(h+160,v,-40,"Pavadinimas",Normal,VEName,false,0);
-  MatrixBegin(4,v+=40,-32,-40,-,10000);
-  MatColTL(1,34,"Prekï¿½s kodas",0,M4Code,ViewOnly,20,ArtCode,false,INSClass);
-  MatColTL(1,134,"Apraï¿½ymas",0,M4Str,ViewOnly,255,Spec,false,0);
-  MatColTL(1,-300,"Sena kaina",0,M45Val,ViewOnly,0,OldPrice,false,0);
-  MatCol(1,-200,"Nauja kaina",0,NewPrice,true,0);
-  MatCol(1,-100,"Delivery Days",0,PlannedDelDays,true,0);
-  EndMatrix;
-  SpecialMenu("Atnaujinti kainas",'',0,"BLT_UpdatePricessm");
-  EndWindow;
+   WindowBegin("Atnaujinti Kainas",BLT_UpdatePIPriceDClass,CGview,-);
+   SetWRect(20,100,630,200);
+   UseView(BLT_UpdatePIPriceVc);
+   Sizeable(-1,-1,0,0); //EBS
+   h = 120; v = 6; vs = 20;
+   EditField(h,v,160,"Nr.",ViewOnly,SerNr,false,0);
+   EditField(h,v+=vs,100,"Tiek˜jas",Normal,VECode,false,VESClass);
+   EditField(h+160,v,-40,"Pavadinimas",Normal,VEName,false,0);
+   MatrixBegin(4,v+=40,-32,-40,-,10000);
+   MatColTL(1,34,"Prek˜s kodas",0,M4Code,ViewOnly,20,ArtCode,false,INSClass);
+   MatColTL(1,134,"Apraäymas",0,M4Str,ViewOnly,255,Spec,false,0);
+   MatColTL(1,-300,"Sena kaina",0,M45Val,ViewOnly,0,OldPrice,false,0);
+   MatCol(1,-200,"Nauja kaina",0,NewPrice,true,0);
+   MatCol(1,-100,"Delivery Days",0,PlannedDelDays,true,0);
+   EndMatrix;
+   SpecialMenu("Atnaujinti kainas",'',0,"BLT_UpdatePricessm");
+   EndWindow;
 
-end;
+ end;
 
-window BLT_UpdatePIPriceLClass:1// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 23 August 2018 13:48:50
-  wtag("language","LIT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
-begin
-  WindowBegin("Atnaujinti Kainas",BLT_UpdatePIPriceLClass,CGmlist,-);
-  SpawnClass(BLT_UpdatePIPriceDClass);
-  SetWRect(64,80,509,320);
-  Sizeable(-1,-1,0,0);
-  UseView(BLT_UpdatePIPriceVc);
-  RecordList(4,17,-21,-39);
-  RlColKey(4,2,"Nr.",SerNr,false,SerNr);
-  RlColKey(100,100, "Tiekï¿½jas",VECode,false,VECode);
-  RlCol(200,200,"Pavadinimas",VEName,false);
-  SearchField("Ieï¿½koti");
-  EndWindow;
-end;
+ window BLT_UpdatePIPriceLClass:1// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 23 August 2018 13:48:50
+   wtag("language","LIT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+ begin
+   WindowBegin("Atnaujinti Kainas",BLT_UpdatePIPriceLClass,CGmlist,-);
+   SpawnClass(BLT_UpdatePIPriceDClass);
+   SetWRect(64,80,509,320);
+   Sizeable(-1,-1,0,0);
+   UseView(BLT_UpdatePIPriceVc);
+   RecordList(4,17,-21,-39);
+   RlColKey(4,2,"Nr.",SerNr,false,SerNr);
+   RlColKey(100,100, "Tiek˜jas",VECode,false,VECode);
+   RlCol(200,200,"Pavadinimas",VEName,false);
+   SearchField("Ieäkoti");
+   EndWindow;
+ end;
 
+
+window BLT_UpdateBasePIPriceDClass:1// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 23 August 2018 13:50:48
+   wtag("language","LIT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+ begin
+   real h,v,vs;
+
+   WindowBegin("Atnaujinti Kainas",BLT_UpdateBasePIPriceDClass,CGview,-);
+   SetWRect(20,100,630,200);
+   UseView(BLT_UpdateBasePIPriceVc);
+   Sizeable(-1,-1,0,0); //EBS
+   h = 120; v = 6; vs = 20;
+   EditField(h,v,160,"Nr.",ViewOnly,SerNr,false,0);
+   EditField(h,v+=vs,100,"Tiek˜jas",Normal,VECode,false,VESClass);
+   EditField(h+160,v,-40,"Pavadinimas",Normal,VEName,false,0);
+   MatrixBegin(4,v+=40,-32,-40,-,10000);
+   MatColTL(1,34,"Prek˜s kodas",0,M4Code,ViewOnly,20,ArtCode,false,INSClass);
+   MatColTL(1,134,"Apraäymas",0,M4Str,ViewOnly,255,Spec,false,0);
+   MatColTL(1,-300,"Sena kaina",0,M45Val,ViewOnly,0,OldPrice,false,0);
+   MatCol(1,-200,"Nauja kaina",0,NewPrice,true,0);
+   EndMatrix;
+   SpecialMenu("Atnaujinti kainas",'',0,"BLT_UpdateBasePricessm");
+   EndWindow;
+
+ end;
+
+ window BLT_UpdateBasePIPriceLClass:1// Edit ************************** BPI Ukraine - KramarAlexandr - Thursday, 23 August 2018 13:48:50
+   wtag("language","LIT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
+ begin
+   WindowBegin("Atnaujinti Kainas",BLT_UpdateBasePIPriceLClass,CGmlist,-);
+   SpawnClass(BLT_UpdateBasePIPriceDClass);
+   SetWRect(64,80,509,320);
+   Sizeable(-1,-1,0,0);
+   UseView(BLT_UpdateBasePIPriceVc);
+   RecordList(4,17,-21,-39);
+   RlColKey(4,2,"Nr.",SerNr,false,SerNr);
+   RlColKey(100,100, "Tiek˜jas",VECode,false,VECode);
+   RlCol(200,200,"Pavadinimas",VEName,false);
+   SearchField("Ieäkoti");
+   EndWindow;
+ end;
 
 window INMinLevelUpdateWClass:1
   wtag("language","LIT"), wtag("product","*"), wtag("productcode","*"), wtag("device","computer")
