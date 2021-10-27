@@ -44,12 +44,14 @@ begin
       if PIr.VECode != BLT_UpdateBasePIPricer.VECode then begin
         wloop = false;
       end else begin
-        INr.Code = PIr.ItemCode;
-        ReadFirstMain(INr,1,true);
-        BLT_UpdateBasePIPricerw.ArtCode = INr.Code;// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 10 September 2018 09:48:58
-        BLT_UpdateBasePIPricerw.Spec = INr.Name;
-        BLT_UpdateBasePIPricerw.OldPrice = INr.UPrice1;
-        MatRowPut(BLT_UpdateBasePIPricer,MatRowCnt(BLT_UpdateBasePIPricer),BLT_UpdateBasePIPricerw);
+        if(PIr.DefaultChoice==1)then begin
+          INr.Code = PIr.ItemCode;
+          ReadFirstMain(INr,1,true);
+          BLT_UpdateBasePIPricerw.ArtCode = INr.Code;// Edit ************************** BPI Ukraine - KramarAlexandr - Monday, 10 September 2018 09:48:58
+          BLT_UpdateBasePIPricerw.Spec = INr.Name;
+          BLT_UpdateBasePIPricerw.OldPrice = INr.UPrice1;
+          MatRowPut(BLT_UpdateBasePIPricer,MatRowCnt(BLT_UpdateBasePIPricer),BLT_UpdateBasePIPricerw);
+        end;
       end;
     end;
   end;
